@@ -1,12 +1,12 @@
 interface ReplicatedStorage {
     Assets: Folder & {
         Viewmodels: Folder & {
-            Default: Model
+            [key: string]: Model
         },
 
+        // anyway to do this automatically??
         Weapons: Folder & {
-            C8A3: Model,
-            M1911: Model
+            [key: string]: Model
         }
     }
 }

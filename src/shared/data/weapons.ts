@@ -1,4 +1,4 @@
-import { ReplicatedStorage } from "@rbxts/services";
+import { ReplicatedStorage } from "@rbxts/services"
 
 export default {
     C8A3: {

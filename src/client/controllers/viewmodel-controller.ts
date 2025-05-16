@@ -4,13 +4,14 @@
 import { Controller, OnRender, OnStart } from "@flamework/core"
 import { ReplicatedStorage, Workspace } from "@rbxts/services"
 import { Object } from "shared/dependencies/object-util";
-import { WeaponsClass } from "client/classes/weapons-class";
+import { Weapons, WeaponsClass } from "client/classes/weapons-class";
 import weapons from "shared/data/weapons";
 import { PlayerController } from "./player-controller";
 
 @Controller()
 export class ViewmodelController implements OnRender, OnStart {
     public model;
+    public animator;
 
     private camera = Workspace.CurrentCamera as Camera;
     
@@ -20,9 +21,12 @@ export class ViewmodelController implements OnRender, OnStart {
         // since there isn't any server sided networking to set-up the proper viewmodel, we'll use the default one.
         
         this.model = ReplicatedStorage.Assets.Viewmodels.Default.Clone();
+        this.animator = this.model.FindFirstChildOfClass("AnimationController")?.FindFirstChildOfClass("Animator") as Animator;
     }
 
     CreateWeapon(weapon: keyof typeof weapons) {
+        if (!Weapons.DoesWeaponExist(weapon)) return;
+
         const newWeapon = new WeaponsClass(weapon, this.playerController, this);
 
         if (!newWeapon) return;
