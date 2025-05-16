@@ -6,6 +6,8 @@ import { ViewmodelController } from "client/controllers/viewmodel-controller";
 import weapons from "shared/data/weapons";
 import { Object } from "shared/dependencies/object-util";
 
+import Signal from "@rbxts/signal";
+
 export namespace Weapons {
     export function DoesWeaponExist(weapon: keyof typeof weapons) {
         return weapons[weapon] !== undefined; 
@@ -19,7 +21,14 @@ export class WeaponsClass {
     private model;
     private animations: { [key: string]: AnimationTrack } = {};
 
-    private isEquipped = false;
+    private state = {
+        isEnabled: false,
+        isEquipped: false
+    };
+
+    public signals = {
+        unEquipped: new Signal(),
+    }
 
     constructor(readonly weaponName: keyof typeof weapons, private playerController: PlayerController, private viewmodelController: ViewmodelController) {
         this.name = weaponName;
@@ -61,17 +70,43 @@ export class WeaponsClass {
         const motor = Object.Rig(rigPart, this.model.PrimaryPart!, CF)
         motor.Parent = this.model.PrimaryPart;
     }
+    
+    IsEquipped() {
+        return this.state.isEquipped;
+    }
 
     Equip() {
-        if (this.isEquipped === true) return;
+        if (this.state.isEquipped === true) return;
         if (this.playerController.DoesPlayerHaveAWeaponEquipped()) return;
 
-        this.isEquipped = true;
+        this.playerController.EquipWeapon(this.name);
+        this.state.isEquipped = true;
 
         this.model.Parent = this.viewmodelController.model;
         Object.SetPhysics(this.model, false, false);
 
         this.animations.Equip.Play();
         this.animations.Idle.Play();
+
+        task.delay(this.data.EquipTime, () => {
+            this.state.isEnabled = true;
+        })
+    }   
+
+    Unequip() {
+        if (this.state.isEquipped === false) return;
+
+        this.state.isEnabled = false;
+
+        this.animations.Idle.Stop();
+        this.animations.Unequip.Play();
+
+        task.delay(this.data.UnequipTime, () => {
+            this.state.isEquipped = false;
+            this.playerController.EquipWeapon(undefined);
+            this.model.Parent = undefined;
+
+            this.signals.unEquipped.Fire();
+        })
     }
 }

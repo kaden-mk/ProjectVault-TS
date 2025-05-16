@@ -9,7 +9,7 @@ export class PlayerController implements OnRender, OnStart {
         equippedWeapon: undefined
     }
 
-    EquipWeapon(weaponName: string) {
+    EquipWeapon(weaponName?: string) {
         this.state.equippedWeapon = weaponName; 
     }
 
