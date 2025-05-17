@@ -8,16 +8,20 @@ import { WeaponsClass } from "client/classes/weapons-class";
 export class InputController implements OnStart, OnRender {
     constructor(private viewmodelController: ViewmodelController, private playerController: PlayerController) {}
 
+    private currentWeapon: WeaponsClass | undefined = undefined;
+
     RunEquipWeapon(weapon: WeaponsClass, weapon2: WeaponsClass) {
         if (weapon2?.IsEquipped()) {
             weapon2?.Unequip();
             weapon2?.signals.unEquipped.Wait();
             weapon.Equip();
+            this.currentWeapon = weapon;
 
             return;
         }
 
         weapon.Equip();
+        this.currentWeapon = weapon;
     }
 
     onStart() {
@@ -31,6 +35,18 @@ export class InputController implements OnStart, OnRender {
 
         Input.Bind("EquipWeapon2", Enum.KeyCode.Two, false, () => {
             this.RunEquipWeapon(weapon2, weapon1);
+        })
+
+        Input.Bind("Fire", Enum.UserInputType.MouseButton1, false, () => {
+            this.currentWeapon?.Fire();
+        });
+
+        Input.Bind("Inspect", Enum.KeyCode.B, false, () => {
+            this.currentWeapon?.Inspect();  
+        });
+
+        Input.Bind("Reload", Enum.KeyCode.R, false, () => {
+            this.currentWeapon?.Reload();
         })
     }
 

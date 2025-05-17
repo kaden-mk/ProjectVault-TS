@@ -109,4 +109,25 @@ export class WeaponsClass {
             this.signals.unEquipped.Fire();
         })
     }
+
+    Fire() {
+        if (this.state.isEnabled === false) return;
+        if (this.state.isEquipped === false) return;
+
+        this.animations.Fire.Play();
+    }
+
+    Reload() {
+        if (this.state.isEnabled === false) return;
+        if (this.state.isEquipped === false) return;
+
+        this.animations.Reload.Play();
+    }
+
+    Inspect() {
+        if (this.state.isEnabled === false) return;
+        if (this.state.isEquipped === false) return;
+
+        this.animations.Inspect.Play();
+    }
 }
