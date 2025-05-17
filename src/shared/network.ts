@@ -1,10 +1,13 @@
 import { Networking } from "@flamework/networking";
+import weapons from "./data/weapons";
 
 interface ClientToServerEvents {}
 
 interface ServerToClientEvents {}
 
-interface ClientToServerFunctions {}
+interface ClientToServerFunctions {
+    createWeapon: (weaponName: keyof typeof weapons) => boolean;
+}
 
 interface ServerToClientFunctions {}
 

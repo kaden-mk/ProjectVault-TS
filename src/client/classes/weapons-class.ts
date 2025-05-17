@@ -7,6 +7,7 @@ import weapons from "shared/data/weapons";
 import { Object } from "shared/dependencies/object-util";
 
 import Signal from "@rbxts/signal";
+import { Events, Functions } from "client/network";
 
 export namespace Weapons {
     export function DoesWeaponExist(weapon: keyof typeof weapons) {
@@ -31,6 +32,8 @@ export class WeaponsClass {
     }
 
     constructor(readonly weaponName: keyof typeof weapons, private playerController: PlayerController, private viewmodelController: ViewmodelController) {
+        if (!Functions.createWeapon.invoke(weaponName)) throw `Weapon ${weaponName} does not exist!`;
+        
         this.name = weaponName;
         this.data = weapons[weaponName];
         this.model = this.data.Model.Clone();
