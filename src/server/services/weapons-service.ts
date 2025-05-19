@@ -1,13 +1,13 @@
 import { Service, OnStart } from "@flamework/core"
-import { WeaponsClass } from "server/classes/weapons-class"
+import { Weapon } from "server/classes/weapons-class"
 import { PlayerService } from "./player-service";
 import { Functions } from "server/network"
 
 @Service()
-export class WeaponsService implements OnStart {
+export class WeaponService implements OnStart {
     constructor(private playerService: PlayerService) {};
 
-    private weapons = new Map<string, WeaponsClass>();
+    private weapons = new Map<string, Weapon>();
 
     onStart() {
         Functions.createWeapon.setCallback((player, weaponName) => {
@@ -18,7 +18,7 @@ export class WeaponsService implements OnStart {
             if (playerClass === undefined) return false;
             if (playerClass.inventory.weapons[weaponName] === undefined) return false;
 
-            const weaponClass = new WeaponsClass(weaponName, player, this.playerService);
+            const weaponClass = new Weapon(weaponName, player, this.playerService);
 
             if (weaponClass === undefined) return false;
 

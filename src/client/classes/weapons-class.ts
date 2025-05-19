@@ -9,13 +9,13 @@ import { Object } from "shared/dependencies/object-util";
 import Signal from "@rbxts/signal";
 import { Events, Functions } from "client/network";
 
-export namespace Weapons {
+export namespace WeaponUtil {
     export function DoesWeaponExist(weapon: keyof typeof weapons) {
         return weapons[weapon] !== undefined; 
     }
 }
 
-export class WeaponsClass {
+export class Weapon {
     public name;
 
     private data; // this data should NOT be changed at all.

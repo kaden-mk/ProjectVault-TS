@@ -1,7 +1,7 @@
 import { Players } from "@rbxts/services";
 import weapons from "shared/data/weapons";
 
-export class PlayerClass {
+export class NewPlayer {
     readonly player;
 
     private state = {

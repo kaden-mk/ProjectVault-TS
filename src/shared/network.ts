@@ -7,6 +7,10 @@ interface ServerToClientEvents {}
 
 interface ClientToServerFunctions {
     createWeapon: (weaponName: keyof typeof weapons) => boolean;
+    equipWeapon: (weaponName: keyof typeof weapons) => boolean;
+    unequipWeapon: () => boolean;
+    reloadWeapon: () => boolean;
+    fireWeapon: () => boolean;
 }
 
 interface ServerToClientFunctions {}
