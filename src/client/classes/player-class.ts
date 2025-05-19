@@ -1,8 +1,7 @@
-import { Controller, OnRender, OnStart } from "@flamework/core";
 import { Players } from "@rbxts/services";
 
-@Controller()
-export class PlayerController implements OnRender, OnStart {
+// Will defo clean this up later, but for now this is fine
+export class NewPlayer {
     public player = Players.LocalPlayer;
 
     private state : { [key: string]: string | undefined } = {
@@ -15,13 +14,5 @@ export class PlayerController implements OnRender, OnStart {
 
     DoesPlayerHaveAWeaponEquipped() {
         return this.state.equippedWeapon;
-    }
-
-    onStart() {
-        
-    }
-
-    onRender(dt: number) {
-        
     }
 }

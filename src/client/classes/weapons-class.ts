@@ -1,13 +1,13 @@
 // the main weapon class, handles and creates weapons
 
 import { ReplicatedStorage } from "@rbxts/services"
-import { PlayerController } from "client/controllers/player-controller";
-import { ViewmodelController } from "client/controllers/viewmodel-controller";
 import weapons from "shared/data/weapons";
 import { Object } from "shared/dependencies/object-util";
 
 import Signal from "@rbxts/signal";
 import { Events, Functions } from "client/network";
+import { Viewmodel } from "./viewmodel-class";
+import { NewPlayer } from "./player-class";
 
 export namespace WeaponUtil {
     export function DoesWeaponExist(weapon: keyof typeof weapons) {
@@ -31,7 +31,7 @@ export class Weapon {
         unEquipped: new Signal(),
     }
 
-    constructor(readonly weaponName: keyof typeof weapons, private playerController: PlayerController, private viewmodelController: ViewmodelController) {
+    constructor(readonly weaponName: keyof typeof weapons, private playerController: NewPlayer, private viewmodelController: Viewmodel) {
         if (!Functions.createWeapon.invoke(weaponName)) throw `Weapon ${weaponName} does not exist!`;
         
         this.name = weaponName;
@@ -79,8 +79,8 @@ export class Weapon {
     }
 
     Equip() {
-        if (this.state.isEquipped === true) return;
-        if (this.playerController.DoesPlayerHaveAWeaponEquipped()) return;
+        if (this.state.isEquipped === true) return false;
+        if (this.playerController.DoesPlayerHaveAWeaponEquipped()) return false;
 
         this.playerController.EquipWeapon(this.name);
         this.state.isEquipped = true;
@@ -94,6 +94,8 @@ export class Weapon {
         task.delay(this.data.EquipTime, () => {
             this.state.isEnabled = true;
         })
+
+        return true;
     }   
 
     Unequip() {
