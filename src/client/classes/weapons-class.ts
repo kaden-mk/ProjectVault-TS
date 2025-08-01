@@ -4,7 +4,7 @@ import { ReplicatedStorage } from "@rbxts/services"
 import weapons from "shared/data/weapons";
 import { Object } from "shared/dependencies/object-util";
 
-import Signal from "@rbxts/signal";
+import Signal from "@rbxts/lemon-signal";
 import { Events, Functions } from "client/network";
 import { Viewmodel } from "./viewmodel-class";
 import { NewPlayer } from "./player-class";

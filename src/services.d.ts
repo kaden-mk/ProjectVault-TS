@@ -1,10 +1,13 @@
 interface ReplicatedStorage {
     Assets: Folder & {
         Viewmodels: Folder & {
-            [key: string]: Model
+            [key: string]: Model  & {
+                AnimationController: AnimationController & {
+                    Animator: Animator
+                }
+            }
         },
 
-        // anyway to do this automatically??
         Weapons: Folder & {
             [key: string]: Model
         }

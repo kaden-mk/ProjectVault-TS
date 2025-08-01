@@ -13,7 +13,7 @@ export class Viewmodel {
 
     constructor(private playerController: NewPlayer) {
         this.model = ReplicatedStorage.Assets.Viewmodels.Default.Clone();
-        this.animator = this.model.FindFirstChildOfClass("AnimationController")?.FindFirstChildOfClass("Animator") as Animator;
+        this.animator = this.model.AnimationController.Animator;
         
         this.Init();
     }

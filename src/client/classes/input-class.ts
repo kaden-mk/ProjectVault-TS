@@ -9,6 +9,8 @@ interface Binding {
 }
 
 export class Input {
+	enabled = true;
+
 	private bindings: { [key: string]: Binding } = {};
 
     private MatchesInput(code: InputValue | InputValue[], input: InputValue): boolean {
@@ -53,6 +55,7 @@ export class Input {
 	public Init() {
 		UserInputService.InputBegan.Connect((input, gameProcessedEvent) => {
 			if (gameProcessedEvent) return;
+			if (!this.enabled) return; // for input states n stuff
 
 			const inputType = input.UserInputType !== Enum.UserInputType.Keyboard ? input.UserInputType : input.KeyCode;
 			const binding = this.FindBinding(inputType);
