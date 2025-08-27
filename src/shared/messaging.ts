@@ -1,15 +1,14 @@
 import { MessageEmitter } from "@rbxts/tether";
-import type { u8 } from "@rbxts/serio";
+import weapons from "./data/weapons";
 
 export const messaging = MessageEmitter.create<MessageData>();
 
 export const enum Message {
-  Test,
+  createWeapon,
+  createWeaponReturn
 }
 
 export interface MessageData {
-  [Message.Test]: {
-    readonly foo: string;
-    readonly n: u8;
-  };
+  [Message.createWeapon]: { readonly weaponName: keyof typeof weapons };
+  [Message.createWeaponReturn]: boolean;
 }

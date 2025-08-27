@@ -91,10 +91,10 @@ export class GameController implements OnStart, OnRender {
         this.EquipWeapon(this.playerWeapons["C8A3"]);
 
         // test
-        messaging.server.emit(Message.Test, {
+        /*messaging.server.emit(Message.Test, {
             foo: "bar",
             n: 69,
-        });
+        });*/
     }
 
     onRender() {

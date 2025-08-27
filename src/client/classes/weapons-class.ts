@@ -5,7 +5,7 @@ import weapons from "shared/data/weapons";
 import { Object } from "shared/dependencies/object-util";
 
 import Signal from "@rbxts/lemon-signal";
-import { Events, Functions } from "client/network";
+import { messaging, Message } from "shared/messaging";
 import { Viewmodel } from "./viewmodel-class";
 import { NewPlayer } from "./player-class";
 
@@ -31,8 +31,8 @@ export class Weapon {
         unEquipped: new Signal(),
     }
 
-    constructor(readonly weaponName: keyof typeof weapons, private playerController: NewPlayer, private viewmodelController: Viewmodel) {
-        if (!Functions.createWeapon.invoke(weaponName)) throw `Weapon ${weaponName} does not exist!`;
+    constructor(readonly weaponName: keyof typeof weapons, private playerController: NewPlayer, private viewmodelController: Viewmodel) {        
+        if (!messaging.server.invoke(Message.createWeapon, Message.createWeaponReturn, { weaponName: weaponName })) throw `Weapon ${weaponName} does not exist!`;
         
         this.name = weaponName;
         this.data = weapons[weaponName];

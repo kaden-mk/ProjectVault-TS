@@ -1,7 +1,7 @@
 import { Service, OnStart } from "@flamework/core"
 import { Weapon } from "server/classes/weapons-class"
 import { PlayerService } from "./player-service";
-import { Functions } from "server/network"
+import { messaging, Message } from "shared/messaging"
 
 @Service()
 export class WeaponService implements OnStart {
@@ -10,11 +10,12 @@ export class WeaponService implements OnStart {
     private weapons = new Map<string, Weapon>();
 
     onStart() {
-        Functions.createWeapon.setCallback((player, weaponName) => {
-            if (this.weapons.has(weaponName)) return false;
+        messaging.server.setCallback(Message.createWeapon, Message.createWeaponReturn, (player, data) => {
+            if (this.weapons.has(data.weaponName)) return false;
 
+            const weaponName = data.weaponName;
             const playerClass = this.playerService.GetPlayer(player);
-
+            
             if (playerClass === undefined) return false;
             if (playerClass.inventory.weapons[weaponName] === undefined) return false;
 

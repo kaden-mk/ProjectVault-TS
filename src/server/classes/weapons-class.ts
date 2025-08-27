@@ -1,6 +1,5 @@
 import weapons from "shared/data/weapons";
 import { PlayerService } from "server/services/player-service";
-import { Events } from "server/network";
 
 export class Weapon {
     readonly name;
