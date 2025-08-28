@@ -6,6 +6,7 @@ import { NewPlayer } from "client/classes/player-class";
 import { Viewmodel } from "client/classes/viewmodel-class";
 import { Weapon } from "client/classes/weapons-class";
 import { Input } from "client/classes/input-class";
+import { Workspace } from "@rbxts/services";
 import { Message, messaging } from "shared/messaging";
 
 /**

@@ -19,7 +19,6 @@ export class NewPlayer {
 
     constructor() {
         messaging.client.on(Message.playerSessionSync, payload => {
-            print(payload);
             this.syncer.sync(payload);
         });
 

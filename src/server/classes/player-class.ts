@@ -3,8 +3,6 @@ import atoms from "shared/data/atoms";
 export class NewPlayer {
     readonly player;
 
-    public atomState;
-
     private state = {
         equippedWeapon: undefined as string | undefined,
     };
@@ -16,6 +14,8 @@ export class NewPlayer {
     public inventory = {        
         weapons: {} as { [key: string]: boolean },
     }
+    
+    public atomState: typeof atoms;
 
     constructor(readonly playerItem: Player, playerState: typeof atoms) {
         this.atomState = playerState;
