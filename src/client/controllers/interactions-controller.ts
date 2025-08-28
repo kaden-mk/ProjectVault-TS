@@ -3,6 +3,7 @@ import { Workspace, Players } from "@rbxts/services";
 import { Interactable } from "client/components/interactions";
 import { Components } from "@flamework/components";
 import { Input } from "client/classes/input-class";
+import { UITil } from "client/utility/ui-til";
 
 const components = Dependency<Components>();
 
@@ -40,13 +41,20 @@ export class InteractionsController implements OnStart, OnRender {
         this.highlight.FillTransparency = 0.5;
         this.highlight.OutlineColor = Color3.fromRGB(255, 255, 255);
 
-        this.inputController.Bind("Interact", Enum.KeyCode.F, false, () => {
-            print("interact");
+        this.inputController.Bind("Interact", Enum.KeyCode.F, true, (input, ended) => {
+            if (!this.currentInteractable) return;
+
+            if (ended) 
+                this.currentInteractable.cancelInteraction();
+            else
+                this.currentInteractable.onInteract();
         });
     }
 
     onRender() {
         this.currentInteractable = GetInteractableFromRay();
+
+        UITil.UpdateInteractionText(this.currentInteractable?.getText() || undefined);
 
         this.highlight.Adornee = this.currentInteractable?.instance || undefined;
     }

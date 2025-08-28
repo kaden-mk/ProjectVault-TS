@@ -11,7 +11,7 @@ const interactionBackground = interactionFrame.WaitForChild("Background") as Fra
 const interactionProgress = interactionFrame.WaitForChild("Progress") as Frame;
 
 export namespace UITil {
-    export function UpdateInteractionText(text: string) {
+    export function UpdateInteractionText(text: string | undefined) {
         if (!text) {
             interactionLabel.Visible = false;
             return;

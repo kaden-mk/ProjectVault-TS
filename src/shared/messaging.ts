@@ -11,7 +11,9 @@ export const enum Message {
   createWeapon,
   createWeaponReturn,
   requestSessionState,
-  playerSessionSync
+  playerSessionSync,
+  startInteraction,
+  cancelInteraction
 }
 
 export interface MessageData {
@@ -22,4 +24,7 @@ export interface MessageData {
   /* session */
   [Message.requestSessionState]: undefined,
   [Message.playerSessionSync]: SyncPayload<typeof atoms>
+
+  /* interactions */
+
 }

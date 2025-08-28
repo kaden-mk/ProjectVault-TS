@@ -5,7 +5,7 @@ type InputValue = Enum.KeyCode | Enum.UserInputType;
 interface Binding {
 	code: InputValue | InputValue[];
 	ends: boolean;
-	callback: (input: InputObject) => undefined;
+	callback: (input: InputObject, ended: boolean) => undefined;
 }
 
 export class Input {
@@ -36,7 +36,7 @@ export class Input {
 		return false;
 	}
 
-	public Bind(inputName: string, code: InputValue | InputValue[], ends: boolean, callback: (input: InputObject) => undefined) {
+	public Bind(inputName: string, code: InputValue | InputValue[], ends: boolean, callback: (input: InputObject, ended: boolean) => undefined) {
 		if (this.bindings[inputName] !== undefined) return;
 
 		this.bindings[inputName] = {
@@ -53,6 +53,8 @@ export class Input {
 	}
 
 	public Init() {
+		// this should definitely be improved
+
 		UserInputService.InputBegan.Connect((input, gameProcessedEvent) => {
 			if (gameProcessedEvent) return;
 			if (!this.enabled) return; // for input states n stuff
@@ -62,7 +64,20 @@ export class Input {
 
 			if (binding === false) return;
 
-			binding.callback(input);
+			binding.callback(input, false);
+		});
+
+		UserInputService.InputEnded.Connect((input, gameProcessedEvent) => {
+			if (gameProcessedEvent) return;
+			if (!this.enabled) return; // for input states n stuff
+
+			const inputType = input.UserInputType !== Enum.UserInputType.Keyboard ? input.UserInputType : input.KeyCode;
+			const binding = this.FindBinding(inputType);
+
+			if (binding === false) return;
+			if (!binding.ends) return;
+
+			binding.callback(input, true);
 		});
 	}
 }

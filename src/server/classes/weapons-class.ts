@@ -26,7 +26,7 @@ export class Weapon {
         if (this.owner.player.Character === undefined) return;
         if (this.owner.player.Character.FindFirstChildOfClass("Humanoid") === undefined) return;
 
-        for (const anim of this.model.FindFirstChild("Animations")!.FindFirstChild("TPS")!.GetChildren()) {
+        for (const anim of this.model.FindFirstChild("Animations")!.FindFirstChild("TP")!.GetChildren()) {
             if (anim.IsA("Animation") === false) continue;
 
             this.animations[anim.Name] = this.owner.player.Character.FindFirstChild("Humanoid")!.FindFirstChildOfClass("Animator")!.LoadAnimation(anim as Animation);
