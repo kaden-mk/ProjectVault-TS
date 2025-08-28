@@ -1,8 +1,9 @@
-import { Players } from "@rbxts/services";
-import weapons from "shared/data/weapons";
+import atoms from "shared/data/atoms";
 
 export class NewPlayer {
     readonly player;
+
+    public atomState;
 
     private state = {
         equippedWeapon: undefined as string | undefined,
@@ -16,7 +17,8 @@ export class NewPlayer {
         weapons: {} as { [key: string]: boolean },
     }
 
-    constructor(readonly playerItem: Player) {
+    constructor(readonly playerItem: Player, playerState: typeof atoms) {
+        this.atomState = playerState;
         this.player = playerItem;
         this.inventory.weapons = {
             C8A3: true,
