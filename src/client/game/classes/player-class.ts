@@ -1,8 +1,8 @@
 import { Players } from "@rbxts/services";
-import { messaging, Message } from "shared/messaging";
+import { messaging, Message } from "shared/game/messaging";
 
 import CharmSync from "@rbxts/charm-sync";
-import atoms from "shared/data/atoms";
+import atoms from "shared/game/data/atoms";
 
 // Will defo clean this up later, but for now this is fine
 export class NewPlayer {

@@ -2,12 +2,10 @@
 // well on the client but that does include inputs for movement and other things
 
 import { Controller, OnRender, OnStart } from "@flamework/core";
-import { NewPlayer } from "client/classes/player-class";
-import { Viewmodel } from "client/classes/viewmodel-class";
-import { Weapon } from "client/classes/weapons-class";
-import { Input } from "client/classes/input-class";
-import { Workspace } from "@rbxts/services";
-import { Message, messaging } from "shared/messaging";
+import { NewPlayer } from "client/game/classes/player-class";
+import { Viewmodel } from "client/game/classes/viewmodel-class";
+import { Weapon } from "client/game/classes/weapons-class";
+import { Input } from "client/game/classes/input-class";
 
 /**
  *     RunEquipWeapon(weapon: Weapon, weapon2: Weapon) {

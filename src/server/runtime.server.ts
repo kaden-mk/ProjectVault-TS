@@ -1,7 +1,11 @@
 import { Flamework } from "@flamework/core";
+import { Workspace } from "@rbxts/services";
 
-Flamework.addPaths("src/server/components");
-Flamework.addPaths("src/server/services");
-Flamework.addPaths("src/shared/components");
+if (Workspace.GetAttribute("Type") === "Game") {
+    Flamework.addPaths("src/server/game/components");
+    Flamework.addPaths("src/server/game/services");
+    Flamework.addPaths("src/shared/game/components");
+} else if (Workspace.GetAttribute("Type") === "Lobby") {
+}
 
 Flamework.ignite();

@@ -1,7 +1,7 @@
 import { Service, OnStart } from "@flamework/core"
-import { Weapon } from "server/classes/weapons-class"
+import { Weapon } from "server/game/classes/weapons-class"
 import { PlayerService } from "./player-service";
-import { messaging, Message } from "shared/messaging"
+import { messaging, Message } from "shared/game/messaging"
 
 @Service()
 export class WeaponService implements OnStart {

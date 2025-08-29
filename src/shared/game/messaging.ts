@@ -2,7 +2,7 @@ import { MessageEmitter } from "@rbxts/tether";
 import { SyncPayload } from "@rbxts/charm-sync";
 
 import weapons from "./data/weapons";
-import atoms from "shared/data/atoms";
+import atoms from "shared/game/data/atoms";
 
 export const messaging = MessageEmitter.create<MessageData>();
 
@@ -13,6 +13,7 @@ export const enum Message {
   requestSessionState,
   playerSessionSync,
   startInteraction,
+  startInteractionReturn,
   cancelInteraction
 }
 
@@ -26,5 +27,7 @@ export interface MessageData {
   [Message.playerSessionSync]: SyncPayload<typeof atoms>
 
   /* interactions */
-
+  [Message.startInteraction]: { readonly interaction: Instance };
+  [Message.startInteractionReturn]: boolean;
+  [Message.cancelInteraction]: undefined;
 }

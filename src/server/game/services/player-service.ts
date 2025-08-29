@@ -1,11 +1,11 @@
 import { Service, OnStart } from "@flamework/core";
 import { Players } from "@rbxts/services";
-import { NewPlayer } from "server/classes/player-class";
+import { NewPlayer } from "server/game/classes/player-class";
 import { ServerSyncer } from "@rbxts/charm-sync";
 import { atom } from "@rbxts/charm";
-import { messaging, Message } from "shared/messaging";
+import { messaging, Message } from "shared/game/messaging";
 
-import atoms from "shared/data/atoms";
+import atoms from "shared/game/data/atoms";
 import CharmSync from "@rbxts/charm-sync";
 
 // shout ot to l.iquid on discord for being a big helper and support and i will always appreciate his work

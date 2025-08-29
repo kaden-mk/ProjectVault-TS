@@ -1,5 +1,5 @@
-import weapons from "shared/data/weapons";
-import { PlayerService } from "server/services/player-service";
+import weapons from "shared/game/data/weapons";
+import { PlayerService } from "server/game/services/player-service";
 
 export class Weapon {
     readonly name;

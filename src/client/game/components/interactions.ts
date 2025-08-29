@@ -1,8 +1,9 @@
 import { OnStart } from "@flamework/core";
 import { Component, BaseComponent } from "@flamework/components";
-import { UITil } from "client/utility/ui-til";
+import { UITil } from "client/game/utility/ui-til";
+import { messaging, Message } from "shared/game/messaging";
 
-import interactions from "shared/data/interactions";
+import interactions from "shared/game/data/interactions";
 
 let activeInteraction = undefined as Interactable | undefined;
 
@@ -24,7 +25,7 @@ export class Interactable extends BaseComponent<{ Type: string }> implements OnS
     }
 
     public onInteract() {
-        // network check here
+        if (!messaging.server.invoke(Message.startInteraction, Message.startInteractionReturn, { interaction: this.instance })) return;
 
         if (this.data.Type === "Instant") {
             //this.data.Callback?.(this);
@@ -59,7 +60,7 @@ export class Interactable extends BaseComponent<{ Type: string }> implements OnS
     public cancelInteraction() {
         if (activeInteraction !== this) return;
 
-        // network check here
+        messaging.server.emit(Message.cancelInteraction);
         activeInteraction = undefined;
     }
 

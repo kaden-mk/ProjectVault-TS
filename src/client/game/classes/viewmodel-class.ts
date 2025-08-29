@@ -1,8 +1,8 @@
 import { ReplicatedStorage, Workspace } from "@rbxts/services";
 import { Weapon, WeaponUtil } from "./weapons-class";
-import weapons from "shared/data/weapons";
+import weapons from "shared/game/data/weapons";
 import { NewPlayer } from "./player-class";
-import { Object } from "shared/dependencies/object-util";
+import { Object } from "shared/game/dependencies/object-util";
 
 export class Viewmodel {
     model;
