@@ -2,6 +2,7 @@
 // well on the client but that does include inputs for movement and other things
 
 import { Controller, OnRender, OnStart } from "@flamework/core";
+import { UserInputService } from "@rbxts/services"
 import { NewPlayer } from "client/game/classes/player-class";
 import { Viewmodel } from "client/game/classes/viewmodel-class";
 import { Weapon } from "client/game/classes/weapons-class";
@@ -59,15 +60,26 @@ export class GameController implements OnStart, OnRender {
         this.EquipWeapon(weapon);
     }
 
+    private isFiring = false;
+
     private InitializeInputs() {
         // to improve?
         this.weaponInputController.Bind("EquipWeapon", [Enum.KeyCode.One, Enum.KeyCode.Two], false, (input: InputObject) => {
+            this.isFiring = false;
+
             if (input.KeyCode === Enum.KeyCode.One) this.RunEquipWeapon(this.playerWeapons["C8A3"], this.playerWeapons["M1911"]);
             if (input.KeyCode === Enum.KeyCode.Two) this.RunEquipWeapon(this.playerWeapons["M1911"], this.playerWeapons["C8A3"]);
         });
 
-        this.weaponInputController.Bind("Fire", Enum.UserInputType.MouseButton1, false, () => {
-            this.currentWeapon?.Fire();
+        this.weaponInputController.Bind("Fire", Enum.UserInputType.MouseButton1, true, (input, ended) => {
+            if (ended)
+                this.isFiring = false;
+            else {
+                if (this.currentWeapon?.data.Automatic === true) 
+                    this.isFiring = true;
+                
+                this.currentWeapon?.Fire();
+            }
         });
 
         this.weaponInputController.Bind("Reload", Enum.KeyCode.R, false, () => {
@@ -98,5 +110,8 @@ export class GameController implements OnStart, OnRender {
 
     onRender() {
         this.viewmodelController.run();
+
+        if (this.isFiring && UserInputService.IsMouseButtonPressed(Enum.UserInputType.MouseButton1))
+            this.currentWeapon?.Fire();
     }
 }

@@ -23,6 +23,7 @@ interface UIInterface extends PlayerGui {
                     Heist: TextLabel,
                     Description: TextLabel
                 },
+                TextButton: TextButton,
                 TextLabel: TextLabel
             }
         }

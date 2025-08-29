@@ -10,8 +10,10 @@ const playerGui = player.WaitForChild("PlayerGui") as UIInterface;
 export class UIController implements OnStart, OnRender {
     onStart() {
         const mainGui = playerGui.WaitForChild("MainGui") as UIInterface["MainGui"];
-
         mainGui.Enabled = true;
+        
+        const mainTheme = Workspace.WaitForChild("MainMenu") as Sound;
+        mainTheme.Play();
 
         // i seriously need to improve this
         new UIHANDLER_Heists(mainGui.Menus.Heists).Initialize();

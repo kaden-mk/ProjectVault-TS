@@ -1,5 +1,6 @@
 import { Players } from "@rbxts/services"
 import { getSound } from "client/universal/classes/sound"
+import { Message, messaging } from "shared/lobby/messaging"
 import Signal from "signal"
 
 import heists from "client/universal/data/heists"
@@ -19,7 +20,7 @@ export class UIHANDLER_Heists {
     private left;
     private right;
 
-    constructor(frame: Frame) {
+    constructor(frame: UIInterface["MainGui"]["Menus"]["Heists"]) {
         this.interface = frame;
         this.left = this.interface.WaitForChild("Left") as Frame;
         this.right = this.interface.WaitForChild("Right") as Frame;
@@ -54,8 +55,23 @@ export class UIHANDLER_Heists {
 
     Initialize() {
         // create templates
-        const left = this.interface.WaitForChild("Left") as Frame;
-        const heistTemplate = left.WaitForChild("Template") as TextButton;
+        const heistTemplate = this.left.WaitForChild("Template") as TextButton;
+
+        const exit = this.interface.WaitForChild("TextButton") as TextButton;
+        exit.MouseButton1Click.Connect(() => {
+            this.interface.Visible = false;
+            playerGui.MainGui.Menu.Visible = true;
+            getSound("Click").play(true);
+        })
+
+        const play = this.right.WaitForChild("PlayButton") as TextButton;
+        play.MouseButton1Click.Connect(() => {
+            getSound("Click").play(true);
+            messaging.server.emit(Message.teleport, {
+                heist: this.selectedHeist.name,
+                difficulty: "normal"
+            })
+        })
 
         for (const [key, data] of pairs(heists)) {
             this.createButton(key, data, heistTemplate);

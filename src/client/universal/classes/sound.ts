@@ -56,3 +56,8 @@ new SoundData("Click", { properties: {
     SoundId: "18844651131",
     Volume: 1
 } })
+
+new SoundData("Objective", { properties: {
+    SoundId: "5496925234",
+    Volume: 1
+} })

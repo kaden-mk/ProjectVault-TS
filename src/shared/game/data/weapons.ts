@@ -4,6 +4,8 @@ export default {
     C8A3: {
         Model: ReplicatedStorage.Assets.Weapons.C8A3,
 
+        Automatic: true, // for now (maybe add firestates man idk)
+
         HandleRig: {
             VM: {
                 To: "RightArm",
@@ -27,7 +29,7 @@ export default {
             AmmoType: ".45 ACP"
         },
         
-        RPM: 700,
+        RPM: 600,
         
         UnequipTime: 0.2,
         EquipTime: 0.2,
@@ -37,6 +39,8 @@ export default {
 
     M1911: {
         Model: ReplicatedStorage.Assets.Weapons.M1911,
+
+        Automatic: false,
 
         HandleRig: {
             VM: {
@@ -61,7 +65,7 @@ export default {
             AmmoType: ".45 ACP" 
         },
         
-        RPM: 500,
+        RPM: 350,
         
         UnequipTime: 0.2,
         EquipTime: 0.2,

@@ -15,17 +15,24 @@ export namespace WeaponUtil {
     }
 }
 
+const RNG = new Random();
+
 export class Weapon {
     public name;
 
-    private data; // this data should NOT be changed at all.
+    public readonly data;
+
     private model;
     private animations: { [key: string]: AnimationTrack } = {};
+    private sounds: { [key: string]: Sound } = {};
 
     private state = {
         isEnabled: false,
-        isEquipped: false
+        isEquipped: false,
+        canFire: true,
     };
+
+    private cooldown;
 
     public signals = {
         unEquipped: new Signal(),
@@ -36,10 +43,12 @@ export class Weapon {
         
         this.name = weaponName;
         this.data = weapons[weaponName];
+        this.cooldown = 1 / (this.data.RPM / 60);
         this.model = this.data.Model.Clone();
 
         this.InitializeRig();
         this.InitializeAnimations();
+        this.InitializeSounds();
     }
 
     InitializeAnimations() {
@@ -47,6 +56,14 @@ export class Weapon {
             if (anim.IsA("Animation") === false) continue;
 
             this.animations[anim.Name] = this.viewmodelController.animator.LoadAnimation(anim as Animation);
+        }
+    }
+
+    InitializeSounds() {
+        for (const sound of this.model.FindFirstChild("Sounds")!.GetChildren()) {
+            if (sound.IsA("Sound") === false) continue;
+
+            this.sounds[sound.Name] = sound;
         }
     }
 
@@ -118,8 +135,24 @@ export class Weapon {
     Fire() {
         if (this.state.isEnabled === false) return;
         if (this.state.isEquipped === false) return;
+        if (this.state.canFire === false) return;
+
+        this.state.canFire = false;
+        task.delay(this.cooldown, () => {
+            this.state.canFire = true;
+        })
 
         this.animations.Fire.Play();
+
+        /* TODO MAKE THIS IN THE SERVER */
+        const fireSound = this.sounds.Fire.Clone();
+        fireSound.Parent = this.playerController.player.Character?.PrimaryPart;
+        fireSound.PlaybackSpeed = RNG.NextNumber(0.9, 1.2);
+        fireSound.Play();
+
+        fireSound.Ended.Connect(() => {
+            fireSound.Destroy();
+        })
     }
 
     Reload() {
