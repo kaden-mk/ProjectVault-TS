@@ -1,5 +1,5 @@
 import { Players } from "@rbxts/services"
-import { getSound } from "client/universal/classes/sound"
+import { SoundRegistry } from "client/universal/dependencies/sound"
 import { Message, messaging } from "shared/lobby/messaging"
 import Signal from "signal"
 
@@ -35,7 +35,7 @@ export class UIHANDLER_Heists {
         button.Parent = this.left;
 
         button.MouseButton1Down.Connect(() => {
-            getSound("Click").play(true);
+            SoundRegistry.play("Click", true);
             this.selectedHeist = data;
 
             this.update();
@@ -61,12 +61,12 @@ export class UIHANDLER_Heists {
         exit.MouseButton1Click.Connect(() => {
             this.interface.Visible = false;
             playerGui.MainGui.Menu.Visible = true;
-            getSound("Click").play(true);
+            SoundRegistry.play("Click", true);
         })
 
         const play = this.right.WaitForChild("PlayButton") as TextButton;
         play.MouseButton1Click.Connect(() => {
-            getSound("Click").play(true);
+            SoundRegistry.play("Click", true);
             messaging.server.emit(Message.teleport, {
                 heist: this.selectedHeist.name,
                 difficulty: "normal"

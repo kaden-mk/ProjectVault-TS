@@ -1,5 +1,5 @@
 import { TweenService, Players } from "@rbxts/services"
-import { getSound } from "client/universal/classes/sound"
+import { SoundRegistry } from "client/universal/dependencies/sound"
 
 const playerGui = Players.LocalPlayer.WaitForChild("PlayerGui") as UIInterface;
 
@@ -21,7 +21,7 @@ export namespace Button {
         /* TO IMPROVE */
 
         button.MouseEnter.Connect(() => {
-            getSound("Hover").play(true);
+            SoundRegistry.play("Hover", true);
 
             increaseTween.Play();
         })
@@ -31,7 +31,7 @@ export namespace Button {
         })
 
         button.MouseButton1Down.Connect(() => {
-            getSound("Click").play(true);
+            SoundRegistry.play("Click", true);
             decreaseTween.Play();
 
             if (frame) {
