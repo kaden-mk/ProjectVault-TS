@@ -47,9 +47,9 @@ export class HeistsInterface extends BaseElement {
     }
 
     private update() {
-        const imageLabel = this.right.WaitForChild("ImageLabel") as ImageLabel;
-        const heistName = this.right.WaitForChild("Heist") as TextLabel;
-        const description = this.right.WaitForChild("Description") as TextLabel;
+        const imageLabel = this.right.ImageLabel;
+        const heistName = this.right.Heist;
+        const description = this.right.Description;
 
         imageLabel.Image = `rbxassetid://${tostring(this.selectedHeist.icon)}`
         heistName.Text = this.selectedHeist.name;
@@ -68,7 +68,7 @@ export class HeistsInterface extends BaseElement {
             SoundRegistry.play("Click", true);
         })
 
-        const play = this.right.WaitForChild("PlayButton") as TextButton;
+        const play = this.right.PlayButton;
         play.MouseButton1Click.Connect(() => {
             SoundRegistry.play("Click", true);
             messaging.server.emit(Message.teleport, {
