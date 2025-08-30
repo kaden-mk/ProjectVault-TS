@@ -4,11 +4,11 @@ import { Message, messaging } from "shared/game/messaging";
 import { Components } from "@flamework/components";
 import { GetClassFromPlayer } from "server/game/classes/player-class";
 
-const components = Dependency<Components>();
-
 @Service()
 export class InteractionsService implements OnStart {
     onStart() {
+        const components = Dependency<Components>();
+
         messaging.server.setCallback(Message.startInteraction, Message.startInteractionReturn, (player, interaction) => {
             const component = components.getComponent<Interactions>(interaction.interaction);
             if (component === undefined) return false;

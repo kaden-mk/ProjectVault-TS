@@ -1,11 +1,9 @@
 import { Controller, OnRender, OnStart, Dependency } from "@flamework/core";
 import { Workspace, Players } from "@rbxts/services";
-import { Interactable } from "client/game/components/interactions";
+import { Interactable } from "./interactions";
 import { Components } from "@flamework/components";
 import { Input } from "client/game/classes/input-class";
-import { UITil } from "client/game/utility/ui-til";
-
-const components = Dependency<Components>();
+import { UITil } from "client/game/modules/ui-til";
 
 function GetInteractableFromRay(): Interactable | undefined {
     if (Players.LocalPlayer.Character?.Parent === undefined) return undefined;
@@ -13,6 +11,8 @@ function GetInteractableFromRay(): Interactable | undefined {
     const RaycastParameters = new RaycastParams();
     RaycastParameters.FilterType = Enum.RaycastFilterType.Exclude;
     RaycastParameters.FilterDescendantsInstances = [Players.LocalPlayer.Character!];   
+
+    const components = Dependency<Components>();
 
     const ray = Workspace.Raycast(Workspace.CurrentCamera!.CFrame.Position, Workspace.CurrentCamera!.CFrame.LookVector.mul(5), RaycastParameters);
     if (ray && ray.Instance.IsA("BasePart") && ray.Instance.Parent && ray.Instance.HasTag("Interactable")) {

@@ -4,6 +4,10 @@ import weapons from "shared/game/data/weapons";
 import { NewPlayer } from "./player-class";
 import { Object } from "shared/game/dependencies/object-util";
 
+export type RunData = {
+    offset: CFrame
+}
+
 export class Viewmodel {
     model;
     animator;
@@ -35,8 +39,7 @@ export class Viewmodel {
         return newWeapon;
     }
 
-    run() {
-        // a basic test of setting the model to our camera's cframe.
-        this.model.PivotTo(this.camera.CFrame);
+    setViewmodelCFrame(cframe: CFrame) {
+        this.model.PivotTo(cframe);
     }
 }

@@ -2,7 +2,7 @@
 // well on the client but that does include inputs for movement and other things
 
 import { Controller, OnRender, OnStart } from "@flamework/core";
-import { UserInputService } from "@rbxts/services"
+import { UserInputService, Workspace } from "@rbxts/services"
 import { NewPlayer } from "client/game/classes/player-class";
 import { Viewmodel } from "client/game/classes/viewmodel-class";
 import { Weapon } from "client/game/classes/weapons-class";
@@ -100,16 +100,12 @@ export class GameController implements OnStart, OnRender {
         this.playerWeapons["M1911"] = this.viewmodelController.CreateWeapon("M1911") as Weapon;
 
         this.EquipWeapon(this.playerWeapons["C8A3"]);
-
-        // test
-        /*messaging.server.emit(Message.Test, {
-            foo: "bar",
-            n: 69,
-        });*/
     }
 
-    onRender() {
-        this.viewmodelController.run();
+    onRender(dt: number) {
+        const offset = this.currentWeapon?.recoil.Update(dt) as CFrame;
+
+        this.viewmodelController.setViewmodelCFrame(Workspace.CurrentCamera!.CFrame.mul(offset));
 
         if (this.isFiring && UserInputService.IsMouseButtonPressed(Enum.UserInputType.MouseButton1))
             this.currentWeapon?.Fire();

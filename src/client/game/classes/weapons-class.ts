@@ -1,8 +1,11 @@
 // the main weapon class, handles and creates weapons
 
-import { ReplicatedStorage } from "@rbxts/services"
+import { Workspace } from "@rbxts/services"
 import weapons from "shared/game/data/weapons";
 import { Object } from "shared/game/dependencies/object-util";
+
+import { Recoil } from "client/game/classes/recoil/recoil-class"
+import { RecoilProfile } from "client/game/classes/recoil/recoil-profile"
 
 import Signal from "@rbxts/lemon-signal";
 import { messaging, Message } from "shared/game/messaging";
@@ -32,6 +35,8 @@ export class Weapon {
         canFire: true,
     };
 
+    public recoil;
+
     private cooldown;
 
     public signals = {
@@ -45,6 +50,11 @@ export class Weapon {
         this.data = weapons[weaponName];
         this.cooldown = 1 / (this.data.RPM / 60);
         this.model = this.data.Model.Clone();
+
+        const recoilProfile = RecoilProfile.create(this.data.Recoil);
+        recoilProfile.RPM = this.data.RPM;
+
+        this.recoil = new Recoil(Workspace.CurrentCamera!, recoilProfile);
 
         this.InitializeRig();
         this.InitializeAnimations();
@@ -143,6 +153,7 @@ export class Weapon {
         })
 
         this.animations.Fire.Play();
+        this.recoil.Fire();
 
         /* TODO MAKE THIS IN THE SERVER */
         const fireSound = this.sounds.Fire.Clone();

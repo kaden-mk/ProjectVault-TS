@@ -5,11 +5,11 @@ const typeAttribute = Workspace.GetAttribute("Type");
 
 if (typeAttribute === "Game") {
     Flamework.addPaths("src/client/game/classes");
-    Flamework.addPaths("src/client/game/components");
     Flamework.addPaths("src/client/game/controllers");
     Flamework.addPaths("src/shared/game/components");
 } else if (typeAttribute === "Lobby") {
     Flamework.addPaths("src/client/lobby/controllers");
+    Flamework.addPaths("src/client/lobby/elements");
 }
 
 Flamework.ignite();

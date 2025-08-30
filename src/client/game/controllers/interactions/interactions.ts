@@ -1,6 +1,6 @@
 import { OnStart } from "@flamework/core";
 import { Component, BaseComponent } from "@flamework/components";
-import { UITil } from "client/game/utility/ui-til";
+import { UITil } from "client/game/modules/ui-til";
 import { messaging, Message } from "shared/game/messaging";
 
 import interactions from "shared/game/data/interactions";

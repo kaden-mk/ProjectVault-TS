@@ -29,6 +29,26 @@ export default {
             AmmoType: ".45 ACP"
         },
         
+        Recoil: {
+            VerticalBase: 0.6,
+            HorizontalBase: 0.25,
+            RandomJitter: 0.3,
+            RecoverySpeed: 10,
+
+            VerticalPower: 3,
+            HorizontalPower: 1.5,
+
+            ViewmodelKick: 15,
+            ViewmodelTilt: 10,
+            ViewmodelMultiplier: 4,
+
+            MicroShakeIntensity: 1,
+            ContinousFireMultiplier: 1.8,
+
+            CameraDamping: 20,
+            CameraStiffness: 350
+        },
+
         RPM: 600,
         
         UnequipTime: 0.2,
@@ -63,6 +83,26 @@ export default {
             MagazineCapacity: 7,
             MaxMags: 5,
             AmmoType: ".45 ACP" 
+        },
+
+                Recoil: {
+            VerticalBase: 0.6,
+            HorizontalBase: 0.25,
+            RandomJitter: 0.3,
+            RecoverySpeed: 10,
+
+            VerticalPower: 3,
+            HorizontalPower: 1.5,
+
+            ViewmodelKick: 15,
+            ViewmodelTilt: 10,
+            ViewmodelMultiplier: 4,
+
+            MicroShakeIntensity: 1,
+            ContinousFireMultiplier: 1.8,
+
+            CameraDamping: 20,
+            CameraStiffness: 350
         },
         
         RPM: 350,

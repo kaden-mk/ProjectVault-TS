@@ -6,10 +6,6 @@ import { open as openHeists } from "./heists-interface"
 
 @Element()
 export class UIHandler extends BaseElement {
-    constructor() {
-        super();
-    }
-
     onStart() {
         this.mainGui.Enabled = true;
 
