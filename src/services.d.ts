@@ -1,3 +1,8 @@
+interface Workspace {
+    MainMenu: Sound,
+    CameraSet: Part
+}
+
 interface ReplicatedStorage {
     Assets: Folder & {
         Viewmodels: Folder & {

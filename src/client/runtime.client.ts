@@ -3,8 +3,6 @@ import { Workspace } from "@rbxts/services";
 
 const typeAttribute = Workspace.GetAttribute("Type");
 
-Flamework.addPaths("src/client/universal/classes");
-
 if (typeAttribute === "Game") {
     Flamework.addPaths("src/client/game/classes");
     Flamework.addPaths("src/client/game/components");

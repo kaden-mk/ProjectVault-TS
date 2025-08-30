@@ -1,15 +1,22 @@
-import { Players } from "@rbxts/services"
+import { Element, BaseElement } from "client/lobby/elements/core"
 import { SoundRegistry } from "client/universal/dependencies/sound"
 import { Message, messaging } from "shared/lobby/messaging"
-import Signal from "signal"
 
 import heists from "client/universal/data/heists"
 
-const playerGui = Players.LocalPlayer.WaitForChild("PlayerGui") as UIInterface;
+export function open(mainGui: MainGui) {
+    mainGui.Menu.Visible = false;
+    mainGui.Menus.Heists.Visible = true;
+}
 
-export class UIHANDLER_Heists {
-    private interface;
-    private selectedHeist = heists["bank"];
+@Element()
+export class HeistsInterface extends BaseElement {
+    constructor() {
+        super();
+    }
+
+    // TODO: make this somehow automatically choose the first heist
+    private selectedHeist = heists["bank"]; 
 
     private colors = {
         "easy": Color3.fromRGB(0, 205, 0),
@@ -17,14 +24,9 @@ export class UIHANDLER_Heists {
         "hard": Color3.fromRGB(150, 0, 0)
     }
 
-    private left;
-    private right;
-
-    constructor(frame: UIInterface["MainGui"]["Menus"]["Heists"]) {
-        this.interface = frame;
-        this.left = this.interface.WaitForChild("Left") as Frame;
-        this.right = this.interface.WaitForChild("Right") as Frame;
-    }
+    private interface = this.mainGui.Menus.Heists;
+    private left = this.interface.Left;
+    private right = this.interface.Right;
 
     private createButton(key: string, data: typeof heists[keyof typeof heists], template: TextButton) {
         const button = template.Clone();
@@ -33,6 +35,8 @@ export class UIHANDLER_Heists {
 
         button.Text = data.name;
         button.Parent = this.left;
+
+        /* TODO: somehow use button registartion */
 
         button.MouseButton1Down.Connect(() => {
             SoundRegistry.play("Click", true);
@@ -53,14 +57,14 @@ export class UIHANDLER_Heists {
         description.Text = this.selectedHeist.description;
     }
 
-    Initialize() {
-        // create templates
-        const heistTemplate = this.left.WaitForChild("Template") as TextButton;
+    onStart() {
+        const heistTemplate = this.left.Template;
 
-        const exit = this.interface.WaitForChild("TextButton") as TextButton;
+        const exit = this.interface.TextButton;
         exit.MouseButton1Click.Connect(() => {
             this.interface.Visible = false;
-            playerGui.MainGui.Menu.Visible = true;
+            this.mainGui.Menu.Visible = true;
+
             SoundRegistry.play("Click", true);
         })
 
