@@ -1,130 +1,161 @@
 export type Config = {
-    CameraStiffness: number,
-    CameraDamping: number,
+    CameraStiffness?: number
+    CameraDamping?: number
 
-    VerticalStrength?: number,
-    HorizontalStrength?: number,
+    VerticalBase?: number
+    HorizontalBase?: number
+    VerticalRamp?: number
+    HorizontalRamp?: number
 
-    HorizontalBias?: number,
-    VerticalRamp?: number,
-    HorizontalRamp?: number,
+    VerticalScale?: number
+    HorizontalScale?: number
 
-    RandomJitter?: number,
-    RandomTilt?: number,
+    VerticalPower?: number
+    HorizontalPower?: number
 
-    RecoverySpeed: number,
+    HorizontalBias?: number
+    TiltBias?: number
+    RollBias?: number
+    VerticalBias?: number
 
-    PatternScale?: number,
-    IntensityMultiplier?: number,
+    RandomJitter?: number
+    RandomTilt?: number
 
-    ViewmodelKick: number,
-    ViewmodelTilt: number,
-    ViewmodelMultiplier?: number,
+    RecoverySpeed?: number
 
-    VerticalPower?: number,
-    HorizontalPower?: number,
+    PatternScale?: number
+    IntensityMultiplier?: number
 
-    ContinuousFireMultiplier?: number,
-    MicroShakeIntensity?: number,
+    ViewmodelKick?: number
+    ViewmodelTilt?: number
+    ViewmodelMultiplier?: number
+
+    CameraKick?: number
+
+    ContinuousFireMultiplier?: number
+    MicroShakeIntensity?: number
 
     RPM?: number
 }
 
 export type RecoilProfileType = {
-    CameraStiffness: number,
-    CameraDamping: number,
+    CameraStiffness: number
+    CameraDamping: number
 
-    VerticalStrength: number,
-    HorizontalStrength: number,
+    VerticalBase: number
+    HorizontalBase: number
+    VerticalRamp: number
+    HorizontalRamp: number
 
-    HorizontalBias: number,
-    VerticalRamp: number,
-    HorizontalRamp: number,
+    VerticalScale: number
+    HorizontalScale: number
 
-    RandomJitter: number,
-    RandomTilt: number,
+    VerticalPower: number
+    HorizontalPower: number
 
-    RecoverySpeed: number,
+    HorizontalBias: number
+    TiltBias: number
+    RollBias: number
+    VerticalBias: number
 
-    PatternScale: number,
-    IntensityMultiplier: number,
+    RandomJitter: number
+    RandomTilt: number
 
-    ViewmodelKick: number,
-    ViewmodelTilt: number,
-    ViewmodelMultiplier: number,
+    RecoverySpeed: number
 
-    VerticalPower: number,
-    HorizontalPower: number,
+    PatternScale: number
+    IntensityMultiplier: number
 
-    ContinuousFireMultiplier: number,
-    MicroShakeIntensity: number,
+    ViewmodelKick: number
+    ViewmodelTilt: number
+    ViewmodelMultiplier: number
 
-    RPM: number,
+    CameraKick: number
 
-    ShotIndex: number,
+    ContinuousFireMultiplier: number
+    MicroShakeIntensity: number
+
+    RPM: number
+
+    ShotIndex: number
+}
+
+const DEFAULT_PROFILE: RecoilProfileType = {
+    CameraStiffness: 200,
+    CameraDamping: 25,
+
+    VerticalBase: 1.0,
+    HorizontalBase: 0.3,
+    VerticalRamp: 0.0,
+    HorizontalRamp: 0.0,
+
+    VerticalScale: 1.0,
+    HorizontalScale: 1.0,
+
+    VerticalPower: 1.0,
+    HorizontalPower: 1.0,
+
+    HorizontalBias: 0.0,
+    TiltBias: 0.0,
+    RollBias: 0.0,
+    VerticalBias: 0.0,
+
+    RandomJitter: 0.0,
+    RandomTilt: 0.0,
+
+    RecoverySpeed: 8,
+
+    PatternScale: 1.0,
+    IntensityMultiplier: 1.0,
+
+    ViewmodelKick: 1.0,
+    ViewmodelTilt: 0.0,
+    ViewmodelMultiplier: 1.0,
+
+    CameraKick: 0.5,
+
+    ContinuousFireMultiplier: 1.0,
+    MicroShakeIntensity: 1.5,
+
+    RPM: 600,
+
+    ShotIndex: 0,
 }
 
 export namespace RecoilProfile {
     export function create(config: Config): RecoilProfileType {
-        let profile: RecoilProfileType = {
-            CameraStiffness: config.CameraStiffness ?? 200,
-            CameraDamping: config.CameraDamping ?? 25,
-
-            VerticalStrength: config.VerticalStrength ?? 1.0,
-            HorizontalStrength: config.HorizontalStrength ?? 0.3,
-
-            HorizontalBias: config.HorizontalBias ?? 1.0,
-            VerticalRamp: config.VerticalRamp ?? 0.0,
-            HorizontalRamp: config.HorizontalRamp ?? 0.0,
-
-            RandomJitter: config.RandomJitter ?? 0.0,
-            RandomTilt: config.RandomTilt ?? 0.0,
-
-            RecoverySpeed: config.RecoverySpeed ?? 8,
-
-            PatternScale: config.PatternScale ?? 1.0,
-            IntensityMultiplier: config.IntensityMultiplier ?? 1.0,
-
-            ViewmodelKick: config.ViewmodelKick ?? 1.0,
-            ViewmodelTilt: config.ViewmodelTilt ?? 0.0,
-            ViewmodelMultiplier: config.ViewmodelMultiplier ?? 1.0,
-
-            VerticalPower: config.VerticalPower ?? 6,
-            HorizontalPower: config.HorizontalPower ?? 3,
-
-            ContinuousFireMultiplier: config.ContinuousFireMultiplier ?? 1.0,
-            MicroShakeIntensity: config.MicroShakeIntensity ?? 1.5,
-
-            RPM: config.RPM ?? 600,
-
-            ShotIndex: 0,
-        };
-
-        return profile;
+        return { ...DEFAULT_PROFILE, ...config, ShotIndex: 0 }
     }
 
     export function reset(profile: RecoilProfileType) {
-        profile.ShotIndex = 0;
+        profile.ShotIndex = 0
     }
 
-    export function evaluteShot(profile: RecoilProfileType) {
-        profile.ShotIndex += 1;
+    export function evaluateShot(profile: RecoilProfileType) {
+        profile.ShotIndex += 1
 
-        let v = (profile.VerticalStrength + (profile.ShotIndex * profile.VerticalRamp));
-        let h = (profile.HorizontalStrength + (profile.ShotIndex * profile.HorizontalRamp));
+        let v = profile.VerticalBase + profile.ShotIndex * profile.VerticalRamp
+        let h = profile.HorizontalBase + profile.ShotIndex * profile.HorizontalRamp
 
-        v *= profile.PatternScale * profile.IntensityMultiplier;
-        h *= profile.PatternScale * profile.IntensityMultiplier * profile.HorizontalBias;
+        v *= profile.VerticalScale * profile.PatternScale * profile.IntensityMultiplier
+        h *= profile.HorizontalScale * profile.PatternScale * profile.IntensityMultiplier
+
+        h += profile.HorizontalBias
 
         if (profile.RandomJitter > 0) {
-            v += (math.random() - 0.5) * 2 * profile.RandomJitter;
-            h += (math.random() - 0.5) * 2 * profile.RandomJitter;
+            v += (math.random() - 0.5) * 2 * profile.RandomJitter
+            h += (math.random() - 0.5) * 2 * profile.RandomJitter
         }
 
-        let roll = 0;
-        if (profile.RandomTilt)
-            roll = (math.random() - 0.5) * 2 * profile.RandomJitter;
+        let roll = profile.TiltBias
+        if (profile.RandomTilt > 0) {
+            roll += (math.random() - 0.5) * 2 * profile.RandomTilt
+        }
 
         return { h, v, roll }
+    }
+
+    export function withOverrides(base: RecoilProfileType, overrides: Config): RecoilProfileType {
+        return create({ ...base, ...overrides })
     }
 }

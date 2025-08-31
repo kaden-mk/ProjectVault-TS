@@ -5,7 +5,7 @@ import weapons from "shared/game/data/weapons";
 import { Object } from "shared/game/dependencies/object-util";
 
 import { Recoil } from "client/game/classes/recoil/recoil-class"
-import { RecoilProfile } from "client/game/classes/recoil/recoil-profile"
+import { RecoilProfile, RecoilProfileType } from "client/game/classes/recoil/recoil-profile"
 import { Spring } from "client/game/modules/spring"
 
 import Signal from "@rbxts/lemon-signal";
@@ -49,6 +49,9 @@ export class Weapon {
     private aimRotationSpring = new Spring(250, 20);
     private adsTransitionSpring = new Spring(300, 40);
 
+    recoilProfileHip: RecoilProfileType;
+    recoilProfileAds: RecoilProfileType;
+
     constructor(readonly weaponName: keyof typeof weapons, private playerController: NewPlayer, private viewmodelController: Viewmodel) {        
         if (!messaging.server.invoke(Message.createWeapon, Message.createWeaponReturn, { weaponName: weaponName })) throw `Weapon ${weaponName} does not exist!`;
         
@@ -57,10 +60,12 @@ export class Weapon {
         this.cooldown = 1 / (this.data.RPM / 60);
         this.model = this.data.Model.Clone();
 
-        const recoilProfile = RecoilProfile.create(this.data.Recoil);
-        recoilProfile.RPM = this.data.RPM;
+        this.recoilProfileHip = RecoilProfile.create(this.data.Recoil.Hip);
+        this.recoilProfileHip.RPM = this.data.RPM;
 
-        this.recoil = new Recoil(Workspace.CurrentCamera!, recoilProfile);
+        this.recoilProfileAds = RecoilProfile.withOverrides(this.recoilProfileHip, this.data.Recoil.Ads);
+
+        this.recoil = new Recoil(Workspace.CurrentCamera!, this.recoilProfileHip);
 
         this.InitializeRig();
         this.InitializeAnimations();
@@ -146,6 +151,9 @@ export class Weapon {
 
     Aim(enable: boolean) {
         this.state.isAiming = enable;
+
+        const profile = enable ? this.recoilProfileAds : this.recoilProfileHip;
+        this.recoil.SwitchProfile(profile);
     }
 
     Unequip() {

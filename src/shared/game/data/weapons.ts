@@ -38,23 +38,60 @@ export default {
         },
         
         Recoil: {
-            VerticalBase: 0.6,
-            HorizontalBase: 0.25,
-            RandomJitter: 0.3,
-            RecoverySpeed: 25,
+            Hip: {
+                CameraStiffness: 350,
+                CameraDamping: 25,
 
-            VerticalPower: 3,
-            HorizontalPower: 1.5,
+                VerticalBase: 0.9,      
+                HorizontalBase: 0.2,     
+                VerticalRamp: 0.05,      
+                HorizontalRamp: 0.02,   
 
-            ViewmodelKick: 10,
-            ViewmodelTilt: 10,
-            ViewmodelMultiplier: 2,
+                VerticalScale: 1.0,
+                HorizontalScale: 1.0,
 
-            MicroShakeIntensity: 1,
-            ContinousFireMultiplier: 1.8,
+                HorizontalBias: 0.0,     
+                TiltBias: 0.05,        
+                RollBias: -0.08,        
+                VerticalBias: 0.08,     
 
-            CameraDamping: 20,
-            CameraStiffness: 350
+                RandomJitter: 0.12,     
+                RandomTilt: 0.05,       
+
+                CameraKick: 3.2,
+
+                RecoverySpeed: 20,    
+
+                PatternScale: 1.0,
+                IntensityMultiplier: 1.0,
+
+                ViewmodelKick: 8,
+                ViewmodelTilt: 6,
+                ViewmodelMultiplier: 1.2,
+
+                ContinuousFireMultiplier: 1.4,
+                MicroShakeIntensity: 0.5,
+            },
+            Ads: {
+                VerticalBase: 0.6,       
+                HorizontalBase: 0.12,   
+                VerticalRamp: 0.03,
+                HorizontalRamp: 0.01,
+
+                RecoverySpeed: 15,     
+
+                //RollBias: -0.04,        
+                VerticalBias: 0.04,      
+
+                RandomJitter: 0.06,      
+                RandomTilt: 0.02,        
+
+                ViewmodelKick: 3,
+                ViewmodelTilt: 4,
+                ViewmodelMultiplier: 1, // this does nothing?
+
+                ContinuousFireMultiplier: 1.2,
+            }
         },
 
         RPM: 800,

@@ -13,6 +13,12 @@ export class Spring {
         this.Mass = mass ? mass : 1;
     }
 
+    Change(stiffness?: number, damping?: number, mass?: number) {
+        this.Stiffness = stiffness ? stiffness : this.Stiffness;
+        this.Damping = damping ? damping : this.Damping;
+        this.Mass = mass ? mass : this.Mass;
+    }
+
     Shove(force: Vector3) {
         this.velocity = this.velocity.add(force);
     }
