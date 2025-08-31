@@ -2,7 +2,7 @@ import { Controller, OnRender, OnStart, Dependency } from "@flamework/core";
 import { Workspace, Players } from "@rbxts/services";
 import { Interactable } from "./interactions";
 import { Components } from "@flamework/components";
-import { Input } from "client/game/classes/input-class";
+import { Input } from "client/game/input/input-class";
 import { UITil } from "client/game/modules/ui-til";
 
 function GetInteractableFromRay(): Interactable | undefined {

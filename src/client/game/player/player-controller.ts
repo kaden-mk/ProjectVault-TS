@@ -1,13 +1,17 @@
 import { Players } from "@rbxts/services";
 import { messaging, Message } from "shared/game/messaging";
+import { Controller, OnStart } from "@flamework/core"
+import { Weapon } from "../weapons/weapons-class"
 
 import CharmSync from "@rbxts/charm-sync";
 import atoms from "shared/game/data/atoms";
 
-// Will defo clean this up later, but for now this is fine
-export class NewPlayer {
+@Controller()
+export class PlayerController implements OnStart {
     public player = Players.LocalPlayer;
     public replicatedPlayerState = table.clone(atoms); 
+
+    public weapons: { [key: string]: Weapon } = {};
 
     private syncer = CharmSync.client({
         atoms: this.replicatedPlayerState
@@ -17,7 +21,7 @@ export class NewPlayer {
         equippedWeapon: undefined
     }
 
-    constructor() {
+    onStart() {
         messaging.client.on(Message.playerSessionSync, payload => {
             this.syncer.sync(payload);
         });

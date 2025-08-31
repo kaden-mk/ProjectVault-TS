@@ -1,31 +1,13 @@
-// unfinished afffff, this is suppose to handle pretty much the ENTIRE game logic
-// well on the client but that does include inputs for movement and other things
-
-import { Controller, OnRender, OnStart } from "@flamework/core";
-import { TweenService, UserInputService, Workspace, StarterGui } from "@rbxts/services"
-import { NewPlayer } from "client/game/classes/player-class";
-import { Viewmodel } from "client/game/classes/viewmodel-class";
-import { Weapon } from "client/game/classes/weapons-class";
-import { Input } from "client/game/classes/input-class";
+import { Weapon } from "./weapons-class"
+import { ViewmodelController } from "../player/viewmodel-controller"
+import { PlayerController } from "../player/player-controller"
+import { Controller, OnStart, OnRender } from "@flamework/core"
+import { Input } from "../input/input-class"
 import { UITil } from "client/game/modules/ui-til"
-import { RecoilProfileType } from "client/game/classes/recoil/recoil-profile"
-import Iris  from "@rbxts/iris"
+import { TweenService, Workspace, UserInputService } from "@rbxts/services"
+import { RecoilProfileType } from "client/game/weapons/recoil/recoil-profile"
 
-/**
- *     RunEquipWeapon(weapon: Weapon, weapon2: Weapon) {
-        if (weapon2?.IsEquipped()) {
-            weapon2?.Unequip();
-            weapon2?.signals.unEquipped.Wait();
-            weapon.Equip();
-            this.currentWeapon = weapon;
-
-            return;
-        }
-
-        weapon.Equip();
-        this.currentWeapon = weapon;
-    }
- */
+import Iris from "@rbxts/iris"
 
 function createCollapsingHeader(name: string, profile: RecoilProfileType) {
     Iris.CollapsingHeader([ name ]);
@@ -43,31 +25,13 @@ function createCollapsingHeader(name: string, profile: RecoilProfileType) {
 }
 
 @Controller()
-export class GameController implements OnStart, OnRender {
-    private weaponInputController: Input;
-    private viewmodelController: Viewmodel;
-    private playerController: NewPlayer;
+export class WeaponController implements OnStart, OnRender {
+    private inputController = new Input();
 
-    private playerWeapons: { [key: string]: Weapon } = {};
-    private currentWeapon: Weapon | undefined = undefined;
+    constructor(private playerController: PlayerController, private viewmodelController: ViewmodelController) {}
 
-    private isDebugOpen = Iris.State(false);
-
-    constructor() {
-        this.playerController = new NewPlayer();
-        this.viewmodelController = new Viewmodel(this.playerController);
-        this.weaponInputController = new Input();
-    }
-
-    private EquipWeapon(weapon: Weapon) {
-        const didEquip = weapon.Equip();
-
-        if (didEquip) {
-            this.currentWeapon = weapon;
-        }
-    }
-
-    private RunEquipWeapon(weapon: Weapon, weapon2: Weapon) {
+    // TODO: Make it automatically get weapon2 using playerController
+    private RunEquipWeapon(weapon: Weapon, weapon2: Weapon) {  
         if (weapon2?.IsEquipped()) {
             weapon2?.Unequip();
             weapon2?.signals.unEquipped.Wait();
@@ -80,18 +44,27 @@ export class GameController implements OnStart, OnRender {
         this.EquipWeapon(weapon);
     }
 
+    private EquipWeapon(weapon: Weapon) {
+        const didEquip = weapon.Equip();
+
+        if (didEquip)
+            this.currentWeapon = weapon;
+    }
+
     private isFiring = false;
+    private isDebugOpen = Iris.State(false);
+    private currentWeapon: Weapon | undefined = undefined; // maybe make player controller's current weapon also be the weapon itself?
 
     private InitializeInputs() {
-        // to improve?
-        this.weaponInputController.Bind("EquipWeapon", [Enum.KeyCode.One, Enum.KeyCode.Two], false, (input: InputObject) => {
+          // to improve?
+        this.inputController.Bind("EquipWeapon", [Enum.KeyCode.One, Enum.KeyCode.Two], false, (input) => {
             this.isFiring = false;
 
             //if (input.KeyCode === Enum.KeyCode.One) this.RunEquipWeapon(this.playerWeapons["M4A1"], this.playerWeapons["M1911"]);
             //if (input.KeyCode === Enum.KeyCode.Two) this.RunEquipWeapon(this.playerWeapons["M1911"], this.playerWeapons["M4A1"]);
         });
 
-        this.weaponInputController.Bind("Fire", Enum.UserInputType.MouseButton1, true, (input, ended) => {
+        this.inputController.Bind("Fire", Enum.UserInputType.MouseButton1, true, (input, ended) => {
             if (ended)
                 this.isFiring = false;
             else {
@@ -102,7 +75,7 @@ export class GameController implements OnStart, OnRender {
             }
         });
 
-        this.weaponInputController.Bind("Aim", Enum.UserInputType.MouseButton2, true, (input, ended) => {
+        this.inputController.Bind("Aim", Enum.UserInputType.MouseButton2, true, (input, ended) => {
             this.currentWeapon?.Aim(!ended);
             UITil.Crosshair(ended);
 
@@ -111,15 +84,15 @@ export class GameController implements OnStart, OnRender {
             }).Play();
         })
 
-        this.weaponInputController.Bind("Reload", Enum.KeyCode.R, false, () => {
+        this.inputController.Bind("Reload", Enum.KeyCode.R, false, () => {
             this.currentWeapon?.Reload();
         });
 
-        this.weaponInputController.Bind("Inspect", Enum.KeyCode.B, false, () => {
+        this.inputController.Bind("Inspect", Enum.KeyCode.B, false, () => {
             this.currentWeapon?.Inspect();
         });
 
-        this.weaponInputController.Bind("Debug", Enum.KeyCode.K, false, () => {
+        this.inputController.Bind("Debug", Enum.KeyCode.K, false, () => {
             this.isDebugOpen.set(!this.isDebugOpen.get());
             UserInputService.MouseIconEnabled = this.isDebugOpen.get();
             this.playerController.player.CameraMode = Enum.CameraMode.Classic;
@@ -127,17 +100,14 @@ export class GameController implements OnStart, OnRender {
     }
 
     onStart() {
-        StarterGui.SetCoreGuiEnabled("Backpack", false);
-
         UserInputService.MouseIconEnabled = false;
 
         this.InitializeInputs();
-        this.weaponInputController.Init();
+        this.inputController.Init();
 
         // Creating weapons, this is just a test/template so far.
-        this.playerWeapons["M4A1"] = this.viewmodelController.CreateWeapon("M4A1") as Weapon;
-
-        this.EquipWeapon(this.playerWeapons["M4A1"]);
+        this.playerController.weapons["M4A1"] = this.viewmodelController.CreateWeapon("M4A1") as Weapon;
+        this.EquipWeapon(this.playerController.weapons["M4A1"]);
         
         Iris.Init();
         Iris.Connect(() => {
@@ -145,7 +115,7 @@ export class GameController implements OnStart, OnRender {
                 createCollapsingHeader("Hipfire", this.currentWeapon!.recoilProfileHip);
                 createCollapsingHeader("ADS", this.currentWeapon!.recoilProfileAds);
             Iris.End();
-        })
+        })    
     }
 
     onRender(dt: number) {

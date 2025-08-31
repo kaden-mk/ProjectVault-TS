@@ -1,17 +1,20 @@
 // the main weapon class, handles and creates weapons
 
 import { Workspace } from "@rbxts/services"
-import weapons from "shared/game/data/weapons";
 import { Object } from "shared/game/dependencies/object-util";
 
-import { Recoil } from "client/game/classes/recoil/recoil-class"
-import { RecoilProfile, RecoilProfileType } from "client/game/classes/recoil/recoil-profile"
+import { Dependency } from "@flamework/core"
+
+import { Recoil } from "client/game/weapons/recoil/recoil-class"
+import { RecoilProfile, RecoilProfileType } from "client/game/weapons/recoil/recoil-profile"
 import { Spring } from "client/game/modules/spring"
 
-import Signal from "@rbxts/lemon-signal";
 import { messaging, Message } from "shared/game/messaging";
-import { Viewmodel } from "./viewmodel-class";
-import { NewPlayer } from "./player-class";
+import { ViewmodelController } from "../player/viewmodel-controller";
+import { PlayerController } from "../player/player-controller";
+
+import Signal from "@rbxts/lemon-signal";
+import weapons from "shared/game/data/weapons";
 
 export namespace WeaponUtil {
     export function DoesWeaponExist(weapon: keyof typeof weapons) {
@@ -21,6 +24,7 @@ export namespace WeaponUtil {
 
 const RNG = new Random();
 
+//@Dependency()
 export class Weapon {
     public name;
 
@@ -52,11 +56,15 @@ export class Weapon {
     recoilProfileHip: RecoilProfileType;
     recoilProfileAds: RecoilProfileType;
 
-    constructor(readonly weaponName: keyof typeof weapons, private playerController: NewPlayer, private viewmodelController: Viewmodel) {        
+    constructor(readonly weaponName: keyof typeof weapons, protected playerController: PlayerController, protected viewmodelController: ViewmodelController) {        
         if (!messaging.server.invoke(Message.createWeapon, Message.createWeaponReturn, { weaponName: weaponName })) throw `Weapon ${weaponName} does not exist!`;
         
         this.name = weaponName;
         this.data = weapons[weaponName];
+
+        print(this.data);
+        print(this.playerController);
+
         this.cooldown = 1 / (this.data.RPM / 60);
         this.model = this.data.Model.Clone();
 
@@ -99,28 +107,6 @@ export class Weapon {
                 Object.Rig(part0, part1, data.C0);
             }
         }
-
-        /*const handleRig = this.data.HandleRig.VM;
-        const to = handleRig.To;
-        const tagged = handleRig.Tagged;
-        const pos = handleRig.Position;
-        const rot = handleRig.Rotation;
-
-        let rigPart: BasePart | undefined = undefined;
-
-        if (tagged)
-            rigPart = Object.FindPartFromTag(this.viewmodelController.model, to) as BasePart;
-        else
-            rigPart = this.viewmodelController.model.FindFirstChild(to, true) as BasePart;
-
-        const CF = CFrame.fromEulerAnglesYXZ(
-            math.rad(rot.X),
-            math.rad(rot.Y),
-            math.rad(rot.Z)
-        ).add(pos);
-
-        const motor = Object.Rig(rigPart, this.model.PrimaryPart!, CF)
-        motor.Parent = this.model.PrimaryPart;*/
     }
     
     IsEquipped() {
