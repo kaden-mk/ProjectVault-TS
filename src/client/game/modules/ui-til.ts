@@ -1,4 +1,4 @@
-import { Players, RunService } from "@rbxts/services";
+import { Players, RunService, TweenService } from "@rbxts/services";
 
 const player = Players.LocalPlayer;
 
@@ -9,6 +9,8 @@ const interactionFrame = mainGui.WaitForChild("Interact") as Frame;
 const interactionLabel = interactionFrame.WaitForChild("Text") as TextLabel;
 const interactionBackground = interactionFrame.WaitForChild("Background") as Frame;
 const interactionProgress = interactionFrame.WaitForChild("Progress") as Frame;
+
+const crosshair = mainGui.WaitForChild("Crosshair") as ImageLabel;
 
 export namespace UITil {
     export function UpdateInteractionText(text: string | undefined) {
@@ -33,5 +35,13 @@ export namespace UITil {
         
         interactionBackground.Visible = true;
         interactionProgress.Visible = true;
+    }
+
+    export function Crosshair(show: boolean) {
+        const transparency = show ? 0 : 1;
+
+        TweenService.Create(crosshair, new TweenInfo(0.15, Enum.EasingStyle.Sine), {
+            ImageTransparency: transparency
+        }).Play();
     }
 } 

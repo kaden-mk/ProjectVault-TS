@@ -6,6 +6,7 @@ import { Object } from "shared/game/dependencies/object-util";
 
 import { Recoil } from "client/game/classes/recoil/recoil-class"
 import { RecoilProfile } from "client/game/classes/recoil/recoil-profile"
+import { Spring } from "client/game/modules/spring"
 
 import Signal from "@rbxts/lemon-signal";
 import { messaging, Message } from "shared/game/messaging";
@@ -32,16 +33,21 @@ export class Weapon {
     private state = {
         isEnabled: false,
         isEquipped: false,
+        isAiming: false,
         canFire: true,
     };
-
-    public recoil;
 
     private cooldown;
 
     public signals = {
         unEquipped: new Signal(),
     }
+
+    public recoil;
+
+    private aimPositionSpring = new Spring(250, 20);
+    private aimRotationSpring = new Spring(250, 20);
+    private adsTransitionSpring = new Spring(300, 40);
 
     constructor(readonly weaponName: keyof typeof weapons, private playerController: NewPlayer, private viewmodelController: Viewmodel) {        
         if (!messaging.server.invoke(Message.createWeapon, Message.createWeaponReturn, { weaponName: weaponName })) throw `Weapon ${weaponName} does not exist!`;
@@ -78,7 +84,18 @@ export class Weapon {
     }
 
     InitializeRig() {
-        const handleRig = this.data.HandleRig.VM;
+        const rig = this.data.Rig;
+
+        for (const [key, data] of pairs(rig.VM)) {
+            const part0 = Object.FindByPath(this.viewmodelController.model, data.Part0) as BasePart;
+            const part1 = Object.FindByPath(this.model, data.Part1) as BasePart;
+
+            if (part0 && part1) {
+                Object.Rig(part0, part1, data.C0);
+            }
+        }
+
+        /*const handleRig = this.data.HandleRig.VM;
         const to = handleRig.To;
         const tagged = handleRig.Tagged;
         const pos = handleRig.Position;
@@ -98,7 +115,7 @@ export class Weapon {
         ).add(pos);
 
         const motor = Object.Rig(rigPart, this.model.PrimaryPart!, CF)
-        motor.Parent = this.model.PrimaryPart;
+        motor.Parent = this.model.PrimaryPart;*/
     }
     
     IsEquipped() {
@@ -122,8 +139,14 @@ export class Weapon {
             this.state.isEnabled = true;
         })
 
+        this.sounds.Equip.Play();
+
         return true;
     }   
+
+    Aim(enable: boolean) {
+        this.state.isAiming = enable;
+    }
 
     Unequip() {
         if (this.state.isEquipped === false) return;
@@ -171,6 +194,7 @@ export class Weapon {
         if (this.state.isEquipped === false) return;
 
         this.animations.Reload.Play();
+        this.sounds.Reload.Play();
     }
 
     Inspect() {
@@ -178,5 +202,63 @@ export class Weapon {
         if (this.state.isEquipped === false) return;
 
         this.animations.Inspect.Play();
+    }
+
+    private lastIsAiming = false;
+
+    GetAimOffset(dt: number): CFrame {
+        const aimPoint = this.model.FindFirstChild("AimPoint") as BasePart;
+        if (!aimPoint) return CFrame.identity;
+
+        const localOffset = aimPoint.CFrame.ToObjectSpace(this.viewmodelController.model.PrimaryPart!.CFrame);
+        const positionOffset = localOffset.Position;
+        const [x, y, z] = localOffset.ToOrientation();
+
+        const targetPosition = this.state.isAiming ? positionOffset : Vector3.zero;
+        const targetRotation = this.state.isAiming ? new Vector3(x, y, z) : Vector3.zero;
+
+        this.aimPositionSpring.target = targetPosition;
+        this.aimRotationSpring.target = targetRotation;
+
+        const pos = this.aimPositionSpring.Update(dt);
+        const rot = this.aimRotationSpring.Update(dt);
+
+        let finalCFrame = new CFrame(pos).mul(CFrame.Angles(rot.X, rot.Y, rot.Z));
+
+        if (this.state.isAiming !== this.lastIsAiming) {
+            if (this.state.isAiming) {
+                this.adsTransitionSpring.position = new Vector3(0, 0, 0);
+            } else {
+                this.adsTransitionSpring.position = new Vector3(1, 0, 0);
+            }
+            this.adsTransitionSpring.velocity = Vector3.zero;
+            this.lastIsAiming = this.state.isAiming;
+        }
+
+        const targetAlpha = this.state.isAiming ? 1 : 0;
+        this.adsTransitionSpring.target = new Vector3(targetAlpha, 0, 0);
+        const alpha = this.adsTransitionSpring.Update(dt).X;
+
+        const threshold = 0.06; 
+        if (alpha > threshold && alpha < 1 - threshold) {
+            if (this.state.isAiming) {
+                finalCFrame = finalCFrame.mul(
+                    this.data.ADSStartingTransition.Lerp(CFrame.identity, (alpha - threshold) / (1 - threshold))
+                );
+            } else {
+                finalCFrame = finalCFrame.mul(
+                    CFrame.identity.Lerp(this.data.ADSStopStartingTransition, (alpha - threshold) / (1 - threshold))
+                );
+            }
+        }
+
+        return finalCFrame;
+    }
+
+    GetOffset(dt: number): CFrame {
+        const recoilOffset = this.recoil.Update(dt);
+        const aimOffset = this.GetAimOffset(dt);
+
+        return recoilOffset.mul(aimOffset);
     }
 }

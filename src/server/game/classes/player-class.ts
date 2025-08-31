@@ -29,7 +29,7 @@ export class NewPlayer {
         this.atomState = playerState;
         this.player = playerItem;
         this.inventory.weapons = {
-            C8A3: true,
+            M4A1: true,
             M1911: true
         };
 

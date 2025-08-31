@@ -2,11 +2,12 @@
 // well on the client but that does include inputs for movement and other things
 
 import { Controller, OnRender, OnStart } from "@flamework/core";
-import { UserInputService, Workspace } from "@rbxts/services"
+import { TweenService, UserInputService, Workspace } from "@rbxts/services"
 import { NewPlayer } from "client/game/classes/player-class";
 import { Viewmodel } from "client/game/classes/viewmodel-class";
 import { Weapon } from "client/game/classes/weapons-class";
 import { Input } from "client/game/classes/input-class";
+import { UITil } from "client/game/modules/ui-til"
 
 /**
  *     RunEquipWeapon(weapon: Weapon, weapon2: Weapon) {
@@ -67,8 +68,8 @@ export class GameController implements OnStart, OnRender {
         this.weaponInputController.Bind("EquipWeapon", [Enum.KeyCode.One, Enum.KeyCode.Two], false, (input: InputObject) => {
             this.isFiring = false;
 
-            if (input.KeyCode === Enum.KeyCode.One) this.RunEquipWeapon(this.playerWeapons["C8A3"], this.playerWeapons["M1911"]);
-            if (input.KeyCode === Enum.KeyCode.Two) this.RunEquipWeapon(this.playerWeapons["M1911"], this.playerWeapons["C8A3"]);
+            //if (input.KeyCode === Enum.KeyCode.One) this.RunEquipWeapon(this.playerWeapons["M4A1"], this.playerWeapons["M1911"]);
+            //if (input.KeyCode === Enum.KeyCode.Two) this.RunEquipWeapon(this.playerWeapons["M1911"], this.playerWeapons["M4A1"]);
         });
 
         this.weaponInputController.Bind("Fire", Enum.UserInputType.MouseButton1, true, (input, ended) => {
@@ -82,6 +83,15 @@ export class GameController implements OnStart, OnRender {
             }
         });
 
+        this.weaponInputController.Bind("Aim", Enum.UserInputType.MouseButton2, true, (input, ended) => {
+            this.currentWeapon?.Aim(!ended);
+            UITil.Crosshair(ended);
+
+            TweenService.Create(Workspace.CurrentCamera!, new TweenInfo(0.15, Enum.EasingStyle.Sine), {
+                FieldOfView: ended ? 70 : 45
+            }).Play();
+        })
+
         this.weaponInputController.Bind("Reload", Enum.KeyCode.R, false, () => {
             this.currentWeapon?.Reload();
         });
@@ -92,18 +102,19 @@ export class GameController implements OnStart, OnRender {
     }
 
     onStart() {
+        UserInputService.MouseIconEnabled = false;
+
         this.InitializeInputs();
         this.weaponInputController.Init();
 
         // Creating weapons, this is just a test/template so far.
-        this.playerWeapons["C8A3"] = this.viewmodelController.CreateWeapon("C8A3") as Weapon;
-        this.playerWeapons["M1911"] = this.viewmodelController.CreateWeapon("M1911") as Weapon;
+        this.playerWeapons["M4A1"] = this.viewmodelController.CreateWeapon("M4A1") as Weapon;
 
-        this.EquipWeapon(this.playerWeapons["C8A3"]);
+        this.EquipWeapon(this.playerWeapons["M4A1"]);
     }
 
     onRender(dt: number) {
-        const offset = this.currentWeapon?.recoil.Update(dt) as CFrame;
+        const offset = this.currentWeapon?.GetOffset(dt) as CFrame;
 
         this.viewmodelController.setViewmodelCFrame(Workspace.CurrentCamera!.CFrame.mul(offset));
 
