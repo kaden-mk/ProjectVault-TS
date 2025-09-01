@@ -3,8 +3,6 @@
 import { Workspace } from "@rbxts/services"
 import { Object } from "shared/game/dependencies/object-util";
 
-import { Dependency } from "@flamework/core"
-
 import { Recoil } from "client/game/weapons/recoil/recoil-class"
 import { RecoilProfile, RecoilProfileType } from "client/game/weapons/recoil/recoil-profile"
 import { Spring } from "client/game/modules/spring"
@@ -24,7 +22,6 @@ export namespace WeaponUtil {
 
 const RNG = new Random();
 
-//@Dependency()
 export class Weapon {
     public name;
 
@@ -61,10 +58,6 @@ export class Weapon {
         
         this.name = weaponName;
         this.data = weapons[weaponName];
-
-        print(this.data);
-        print(this.playerController);
-
         this.cooldown = 1 / (this.data.RPM / 60);
         this.model = this.data.Model.Clone();
 

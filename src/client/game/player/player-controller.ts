@@ -1,10 +1,11 @@
 import { Players } from "@rbxts/services";
 import { messaging, Message } from "shared/game/messaging";
 import { Controller, OnStart } from "@flamework/core"
-import { Weapon } from "../weapons/weapons-class"
 
 import CharmSync from "@rbxts/charm-sync";
 import atoms from "shared/game/data/atoms";
+
+import { Weapon } from "../weapons/weapon-type";
 
 @Controller()
 export class PlayerController implements OnStart {

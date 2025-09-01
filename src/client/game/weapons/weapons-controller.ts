@@ -4,7 +4,7 @@ import { PlayerController } from "../player/player-controller"
 import { Controller, OnStart, OnRender } from "@flamework/core"
 import { Input } from "../input/input-class"
 import { UITil } from "client/game/modules/ui-til"
-import { TweenService, Workspace, UserInputService } from "@rbxts/services"
+import { TweenService, Workspace, UserInputService, } from "@rbxts/services"
 import { RecoilProfileType } from "client/game/weapons/recoil/recoil-profile"
 
 import Iris from "@rbxts/iris"
@@ -106,7 +106,7 @@ export class WeaponController implements OnStart, OnRender {
         this.inputController.Init();
 
         // Creating weapons, this is just a test/template so far.
-        this.playerController.weapons["M4A1"] = this.viewmodelController.CreateWeapon("M4A1") as Weapon;
+        this.playerController.weapons["M4A1"] = new Weapon("M4A1", this.playerController, this.viewmodelController) as Weapon;
         this.EquipWeapon(this.playerController.weapons["M4A1"]);
         
         Iris.Init();
