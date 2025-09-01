@@ -1,15 +1,15 @@
 // the main weapon class, handles and creates weapons
 
-import { Workspace } from "@rbxts/services"
+import { Workspace } from "@rbxts/services";
 import { Object } from "shared/game/dependencies/object-util";
 
-import { Recoil } from "client/game/weapons/recoil/recoil-class"
-import { RecoilProfile, RecoilProfileType } from "client/game/weapons/recoil/recoil-profile"
-import { Spring } from "client/game/modules/spring"
+import { Spring } from "client/game/modules/spring";
+import { Recoil } from "client/game/weapons/recoil/recoil-class";
+import { RecoilProfile, RecoilProfileType } from "client/game/weapons/recoil/recoil-profile";
 
-import { messaging, Message } from "shared/game/messaging";
-import { ViewmodelController } from "../player/viewmodel-controller";
+import { Message, messaging } from "shared/game/messaging";
 import { PlayerController } from "../player/player-controller";
+import { ViewmodelController } from "../player/viewmodel-controller";
 
 import Signal from "@rbxts/lemon-signal";
 import weapons from "shared/game/data/weapons";
@@ -35,6 +35,7 @@ export class Weapon {
         isEnabled: false,
         isEquipped: false,
         isAiming: false,
+        isReloading: false,
         canFire: true,
     };
 
@@ -47,11 +48,13 @@ export class Weapon {
     public recoil;
 
     private aimPositionSpring = new Spring(250, 20);
-    private aimRotationSpring = new Spring(250, 20);
+    aimRotationSpring = new Spring(300, 20);
     private adsTransitionSpring = new Spring(300, 40);
 
     recoilProfileHip: RecoilProfileType;
     recoilProfileAds: RecoilProfileType;
+
+    private rigMotors = new Map<string, { motor: Motor6D; baseC0: CFrame }>();
 
     constructor(readonly weaponName: keyof typeof weapons, protected playerController: PlayerController, protected viewmodelController: ViewmodelController) {        
         if (!messaging.server.invoke(Message.createWeapon, Message.createWeaponReturn, { weaponName: weaponName })) throw `Weapon ${weaponName} does not exist!`;
@@ -97,7 +100,12 @@ export class Weapon {
             const part1 = Object.FindByPath(this.model, data.Part1) as BasePart;
 
             if (part0 && part1) {
-                Object.Rig(part0, part1, data.C0);
+                const motor = Object.Rig(part0, part1, data.C0);
+
+                this.rigMotors.set(part1.Name, {
+                    motor: motor,
+                    baseC0: data.C0,
+                });
             }
         }
     }
@@ -179,9 +187,22 @@ export class Weapon {
     Reload() {
         if (this.state.isEnabled === false) return;
         if (this.state.isEquipped === false) return;
+        if (this.state.isReloading === true) return; 
+
+        if (this.state.isAiming) {
+            this.animations.Reload.AdjustWeight(0.1);
+        } else {
+            this.animations.Reload.AdjustWeight(1);
+        }
 
         this.animations.Reload.Play();
         this.sounds.Reload.Play();
+
+        this.state.isReloading = true;
+
+        task.delay(this.data.ReloadTime, () => {
+            this.state.isReloading = false;
+        });
     }
 
     Inspect() {

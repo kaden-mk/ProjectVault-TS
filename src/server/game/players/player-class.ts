@@ -1,5 +1,5 @@
+import { Interactions } from "server/game/interactions/interactions";
 import atoms from "shared/game/data/atoms";
-import { Interactions } from "server/game/components/interactions";
 
 export function GetClassFromPlayer(player: Player) {
     return playerClasses.get(player);

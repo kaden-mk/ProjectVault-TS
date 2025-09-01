@@ -1,12 +1,12 @@
-import { Service, OnStart } from "@flamework/core";
-import { Players } from "@rbxts/services";
-import { NewPlayer } from "server/game/classes/player-class";
-import { ServerSyncer } from "@rbxts/charm-sync";
+import { OnStart, Service } from "@flamework/core";
 import { atom } from "@rbxts/charm";
-import { messaging, Message } from "shared/game/messaging";
+import { ServerSyncer } from "@rbxts/charm-sync";
+import { Players } from "@rbxts/services";
+import { NewPlayer } from "server/game/players/player-class";
+import { Message, messaging } from "shared/game/messaging";
 
-import atoms from "shared/game/data/atoms";
 import CharmSync from "@rbxts/charm-sync";
+import atoms from "shared/game/data/atoms";
 
 // shout ot to l.iquid on discord for being a big helper and support and i will always appreciate his work
 let playerSyncers = new Map<Player, ServerSyncer<{}, true>>();

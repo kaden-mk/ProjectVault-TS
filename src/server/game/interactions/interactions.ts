@@ -1,7 +1,7 @@
 import { BaseComponent, Component } from "@flamework/components";
-import { GetClassFromPlayer } from "server/game/classes/player-class";
+import { GetClassFromPlayer } from "server/game/players/player-class";
 
-import interactionsServer from "server/game/data/interactions";
+import interactionsServer from "server/game/interactions/interactions-data";
 import interactions from "shared/game/data/interactions";
 
 @Component({

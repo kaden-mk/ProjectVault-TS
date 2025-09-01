@@ -1,4 +1,4 @@
-import { Interactions } from "server/game/components/interactions";
+import { Interactions } from "server/game/interactions/interactions";
 
 import { TweenService } from "@rbxts/services";
 

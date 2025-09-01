@@ -1,8 +1,8 @@
-import { Service, OnStart, Dependency } from "@flamework/core";
-import { Interactions } from "server/game/components/interactions";
-import { Message, messaging } from "shared/game/messaging";
 import { Components } from "@flamework/components";
-import { GetClassFromPlayer } from "server/game/classes/player-class";
+import { Dependency, OnStart, Service } from "@flamework/core";
+import { Interactions } from "server/game/interactions/interactions";
+import { GetClassFromPlayer } from "server/game/players/player-class";
+import { Message, messaging } from "shared/game/messaging";
 
 @Service()
 export class InteractionsService implements OnStart {

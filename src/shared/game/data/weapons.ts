@@ -98,7 +98,7 @@ export default {
         
         UnequipTime: 0.2,
         EquipTime: 0.2,
-        ReloadTime: 1.4,
-        ReloadEmptyTime: 1.65
+        ReloadTime: 2,
+        ReloadEmptyTime: 2.3
     },
 }
