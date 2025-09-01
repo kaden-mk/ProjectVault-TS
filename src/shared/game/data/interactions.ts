@@ -9,5 +9,9 @@ export default {
         WaitTime: 0.5,
 
         Text: (object: Instance) => `to bag the ${object.Name}`
+    },
+    "Door": {
+        Type: "Instant",
+        Text: (object: Instance) => `to ${object.GetAttribute("Open") ? "close" : "open"} the door`
     }
 }

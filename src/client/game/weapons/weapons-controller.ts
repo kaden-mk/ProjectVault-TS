@@ -1,11 +1,11 @@
-import { Weapon } from "./weapons-class"
-import { ViewmodelController } from "../player/viewmodel-controller"
-import { PlayerController } from "../player/player-controller"
-import { Controller, OnStart, OnRender } from "@flamework/core"
-import { Input } from "../input/input-class"
+import { Controller, OnRender, OnStart } from "@flamework/core"
+import { TweenService, UserInputService, Workspace, } from "@rbxts/services"
 import { UITil } from "client/game/modules/ui-til"
-import { TweenService, Workspace, UserInputService, } from "@rbxts/services"
-import { RecoilProfileType } from "client/game/weapons/recoil/recoil-profile"
+import { RecoilProfile, RecoilProfileType } from "client/game/weapons/recoil/recoil-profile"
+import { Input } from "../input/input-class"
+import { PlayerController } from "../player/player-controller"
+import { ViewmodelController } from "../player/viewmodel-controller"
+import { Weapon } from "./weapons-class"
 
 import Iris from "@rbxts/iris"
 
@@ -65,8 +65,11 @@ export class WeaponController implements OnStart, OnRender {
         });
 
         this.inputController.Bind("Fire", Enum.UserInputType.MouseButton1, true, (input, ended) => {
-            if (ended)
+            if (ended) {
                 this.isFiring = false;
+                RecoilProfile.reset(this.currentWeapon!.recoilProfileAds);
+                RecoilProfile.reset(this.currentWeapon!.recoilProfileHip);
+            }
             else {
                 if (this.currentWeapon?.data.Automatic === true) 
                     this.isFiring = true;
@@ -122,6 +125,7 @@ export class WeaponController implements OnStart, OnRender {
         const offset = this.currentWeapon?.GetOffset(dt) as CFrame;
 
         this.viewmodelController.setViewmodelCFrame(Workspace.CurrentCamera!.CFrame.mul(offset));
+        this.viewmodelController.updateFakeCamera();
 
         if (this.isFiring && UserInputService.IsMouseButtonPressed(Enum.UserInputType.MouseButton1))
             this.currentWeapon?.Fire();

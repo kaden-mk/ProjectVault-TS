@@ -1,9 +1,7 @@
-import { Spring } from "client/game/modules/spring"
-import { RunService } from "@rbxts/services"
-import { RecoilProfile, RecoilProfileType } from "./recoil-profile"
+import { Spring } from "client/game/modules/spring";
+import { RecoilProfile, RecoilProfileType } from "./recoil-profile";
 
 export class Recoil {
-    private shotCount = 0;
     private continousFireTime = 0;
 
     // base springs
@@ -36,7 +34,6 @@ export class Recoil {
     }
 
     Fire() {
-        this.shotCount += 1;
         this.continousFireTime += 1 / this.profile.RPM;
 
         const durationScale = math.min(this.continousFireTime / 2, 1);
@@ -68,9 +65,6 @@ export class Recoil {
 
         pitchTilt += randomV * 0.5 * tiltMultiplier;
         yawTilt   += randomH * 0.5 * tiltMultiplier;
-
-        if (this.shotCount === 1)
-            pitchTilt *= 1.3;
 
         const rollTilt = ((roll + randomV * 1.2) - (this.profile.RollBias ?? 0)) * tiltMultiplier * 0.6;
 
@@ -128,7 +122,7 @@ export class Recoil {
         const clampedPosition = new Vector3(
             math.clamp(finalPosition.X, -1.5, 1.5),
             math.clamp(finalPosition.Y, -1, 1),
-            math.clamp(finalPosition.Z, -0.5, 0.5)
+            math.clamp(finalPosition.Z, -0.65, 0.65)
         );
         const finalRotation = CFrame.Angles(
             math.rad(-vmRot.X + vmShake.X * 25 + vmMicro.X * 10),
@@ -140,7 +134,6 @@ export class Recoil {
     }
 
     public ResetPattern() {
-        this.shotCount = 0;
         this.continousFireTime = 0;
         this.cameraSpring.Reset();
         this.cameraShakeSpring.Reset();

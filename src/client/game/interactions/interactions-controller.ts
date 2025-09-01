@@ -1,9 +1,19 @@
-import { Controller, OnRender, OnStart, Dependency } from "@flamework/core";
-import { Workspace, Players } from "@rbxts/services";
-import { Interactable } from "./interactions";
 import { Components } from "@flamework/components";
+import { Controller, Dependency, OnRender, OnStart } from "@flamework/core";
+import { CollectionService, Players, Workspace } from "@rbxts/services";
 import { Input } from "client/game/input/input-class";
 import { UITil } from "client/game/modules/ui-til";
+import { Interactable } from "./interactions";
+
+// TODO: optimize?
+function FindTagged(instance: Instance, tag: string) {
+    let current: Instance | undefined = instance;
+    while (current) {
+        if (CollectionService.HasTag(current, tag)) return current;
+        current = current.Parent;
+    }
+    return undefined;
+}
 
 function GetInteractableFromRay(): Interactable | undefined {
     if (Players.LocalPlayer.Character?.Parent === undefined) return undefined;
@@ -15,10 +25,14 @@ function GetInteractableFromRay(): Interactable | undefined {
     const components = Dependency<Components>();
 
     const ray = Workspace.Raycast(Workspace.CurrentCamera!.CFrame.Position, Workspace.CurrentCamera!.CFrame.LookVector.mul(5), RaycastParameters);
-    if (ray && ray.Instance.IsA("BasePart") && ray.Instance.Parent && ray.Instance.HasTag("Interactable")) {
-        const component = components.getComponent<Interactable>(ray.Instance);
-        return component;
-    } 
+        
+    if (ray && ray.Instance.IsA("BasePart")) {
+        const tagged = FindTagged(ray.Instance, "Interactable");
+        if (tagged) {
+            const component = components.getComponent<Interactable>(tagged);
+            return component;
+        }
+    }
 }
 
 @Controller()

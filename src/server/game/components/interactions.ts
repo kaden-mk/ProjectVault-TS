@@ -1,9 +1,8 @@
-import { OnStart, OnTick } from "@flamework/core";
-import { Component, BaseComponent } from "@flamework/components";
+import { BaseComponent, Component } from "@flamework/components";
 import { GetClassFromPlayer } from "server/game/classes/player-class";
 
-import interactions from "shared/game/data/interactions";
 import interactionsServer from "server/game/data/interactions";
+import interactions from "shared/game/data/interactions";
 
 @Component({
     tag: "Interactable"
@@ -16,7 +15,11 @@ export class Interactions extends BaseComponent<{ Type: string }> {
         super();
 
         this.data = interactions[this.attributes.Type as keyof typeof interactions];
-        this.callback = interactionsServer[this.attributes.Type as keyof typeof interactionsServer].callback;
+
+        const interactionServerData = interactionsServer[this.attributes.Type as keyof typeof interactionsServer];
+        this.callback = interactionServerData.callback;
+
+        (interactionServerData as any).onInit?.(this)
     }
 
     private getPosition() {
@@ -42,12 +45,12 @@ export class Interactions extends BaseComponent<{ Type: string }> {
         if (playerData.state.activeInteraction !== undefined) return false;
 
         if (this.data.Type === "Instant") {
-            this.callback?.(this, undefined);
+            this.callback?.(this as any, undefined);
             return false;
         }
 
         if (this.callback !== undefined) {
-            const canStart = this.callback(this, "Start");
+            const canStart = this.callback(this as any, "Start");
             if (canStart === false) return false;
         }
 
@@ -79,7 +82,7 @@ export class Interactions extends BaseComponent<{ Type: string }> {
 
             playerData.state.activeInteraction = undefined;
 
-            this.callback?.(this, "End");
+            this.callback?.(this as any, "End");
         })
 
         return true;

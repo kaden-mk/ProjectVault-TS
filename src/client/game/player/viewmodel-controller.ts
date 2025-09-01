@@ -1,6 +1,6 @@
+import { Controller } from "@flamework/core";
 import { ReplicatedStorage, Workspace } from "@rbxts/services";
 import { Object } from "shared/game/dependencies/object-util";
-import { Controller } from "@flamework/core"
 
 export type RunData = {
     offset: CFrame
@@ -12,10 +12,13 @@ export class ViewmodelController {
     animator;
 
     private camera = Workspace.CurrentCamera as Camera;
+    private fakeCamera: BasePart;
+    private oldCameraCFrame = CFrame.identity; // for the fake camera
 
     constructor() {
         this.model = ReplicatedStorage.Assets.Viewmodels.Default.Clone();
         this.animator = this.model.AnimationController.Animator;
+        this.fakeCamera = this.model.FindFirstChild("FakeCamera") as BasePart;
         
         this.Init();
     }
@@ -27,5 +30,11 @@ export class ViewmodelController {
 
     setViewmodelCFrame(cframe: CFrame) {
         this.model.PivotTo(cframe);
+    }
+
+    updateFakeCamera() {
+        const newCameraCFrame = this.fakeCamera.CFrame.ToObjectSpace(this.model.PrimaryPart!.CFrame);
+        Workspace.CurrentCamera!.CFrame = Workspace.CurrentCamera!.CFrame.mul(newCameraCFrame.ToObjectSpace(this.oldCameraCFrame));
+        this.oldCameraCFrame = newCameraCFrame;
     }
 }
