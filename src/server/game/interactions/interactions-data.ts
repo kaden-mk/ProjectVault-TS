@@ -1,5 +1,7 @@
 import { Interactions } from "server/game/interactions/interactions";
 
+import { gameState } from "../state/game-state";
+
 import { TweenService } from "@rbxts/services";
 
 interface Door extends Interactions {
@@ -11,6 +13,7 @@ export default {
     "Instant-Loot": {
         callback: (object: Interactions, interactionType: string | undefined) => {
             object.destroy();
+            gameState.take(gameState.take() + 1000);
         }
     },
     "Loot": {

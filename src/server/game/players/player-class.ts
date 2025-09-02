@@ -1,5 +1,5 @@
 import { Interactions } from "server/game/interactions/interactions";
-import atoms from "shared/game/data/atoms";
+import atoms from "shared/game/data/player-atoms";
 
 export function GetClassFromPlayer(player: Player) {
     return playerClasses.get(player);
@@ -12,7 +12,7 @@ export class NewPlayer {
 
     public state = {
         equippedWeapon: undefined as string | undefined,
-        activeInteraction: undefined as Interactions | undefined
+        activeInteraction: undefined as Interactions | undefined,
     };
 
     public weaponState = {

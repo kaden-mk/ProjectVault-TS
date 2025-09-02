@@ -5,18 +5,22 @@ import { SoundRegistry } from "client/universal/dependencies/sound"
 export class SoundController implements OnStart {
     onStart() {
         SoundRegistry.register("Hover", {
-            SoundId: "5054289267",
+            SoundId: "89795415922557",
             Volume: 1
         })
 
         SoundRegistry.register("Click", {
-            SoundId: "18844651131",
+            SoundId: "100343570403749",
             Volume: 1
         })
 
-        // TODO: make sound registry for ingame (or just make it shared?)
         SoundRegistry.register("Objective", {
             SoundId: "5496925234",
+            Volume: 1
+        })
+    
+        SoundRegistry.register("AmmoPickup", {
+            SoundId: "86885048048454",
             Volume: 1
         })
     }

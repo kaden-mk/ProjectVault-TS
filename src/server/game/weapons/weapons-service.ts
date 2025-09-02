@@ -7,11 +7,12 @@ import { PlayerService } from "../players/player-service";
 export class WeaponService implements OnStart {
     constructor(private playerService: PlayerService) {};
 
-    private weapons = new Map<string, Weapon>();
+    private weapons: Record<string, Record<string, Weapon>> = {};
 
     onStart() {
         messaging.server.setCallback(Message.createWeapon, Message.createWeaponReturn, (player, data) => {
-            if (this.weapons.has(data.weaponName)) return false;
+            if (!this.weapons[player.Name]) this.weapons[player.Name] = {};
+            if (this.weapons[player.Name][data.weaponName]) return false;
 
             const weaponName = data.weaponName;
             const playerClass = this.playerService.GetPlayer(player);
@@ -23,10 +24,37 @@ export class WeaponService implements OnStart {
 
             if (weaponClass === undefined) return false;
 
-            this.weapons.set(weaponName, weaponClass);
+            this.weapons[player.Name][data.weaponName] = weaponClass;
             print(`Created weapon ${weaponName} for player ${player.Name}`);
 
             return true;
         });
+
+        messaging.server.setCallback(Message.equipWeapon, Message.equipWeaponReturn, (player, data) => {
+            if (!this.weapons[player.Name]) return false;
+            if (!this.weapons[player.Name][data.weaponName]) return false;
+
+            const weapon = this.weapons[player.Name][data.weaponName];
+
+            const playerClass = this.playerService.GetPlayer(player);
+            if (!playerClass) return false;
+            if (playerClass.GetEquippedWeapon() === data.weaponName) return false;
+
+            return weapon.Equip();
+        });
+
+        messaging.server.setCallback(Message.fireWeapon, Message.fireWeaponReturn, (player, data) => {
+            if (!this.weapons[player.Name]) return false;
+            
+            const playerClass = this.playerService.GetPlayer(player);
+            if (!playerClass) return false;
+            if (playerClass.GetEquippedWeapon() === undefined) return false;
+
+            const weapon = this.weapons[player.Name][playerClass.GetEquippedWeapon() as string];
+
+            if (!weapon) return false;
+
+            return weapon.Fire(data.startCFrame);
+        })
     }
 }

@@ -1,3 +1,4 @@
+import { FormatStandard } from "@rbxts/format-number";
 import { Players, RunService, TweenService } from "@rbxts/services";
 
 const player = Players.LocalPlayer;
@@ -9,6 +10,10 @@ const interactionFrame = mainGui.WaitForChild("Interact") as Frame;
 const interactionLabel = interactionFrame.WaitForChild("Text") as TextLabel;
 const interactionBackground = interactionFrame.WaitForChild("Background") as Frame;
 const interactionProgress = interactionFrame.WaitForChild("Progress") as Frame;
+
+const topLeft = mainGui.WaitForChild("TopLeft") as Frame & {
+    TextLabel: TextLabel
+};
 
 const crosshair = mainGui.WaitForChild("Crosshair") as ImageLabel;
 
@@ -43,5 +48,25 @@ export namespace UITil {
         TweenService.Create(crosshair, new TweenInfo(0.15, Enum.EasingStyle.Sine), {
             ImageTransparency: transparency
         }).Play();
+    }
+
+    let currentTake = 0;
+
+    export function UpdateTake(take: number) {
+        const start = currentTake;
+        const last = take;
+        const duration = 1;
+        const steps = 30;
+        const stepTime = duration / steps;
+
+        task.spawn(() => {            
+            for (let step = 1; step <= steps; step++) {
+                const progress = step / steps;
+                const value = math.floor(start + (last - start) * progress);
+                topLeft.TextLabel.Text = `Take: $${FormatStandard(value)}`;
+                task.wait(stepTime);
+            }
+            currentTake = last;
+        });
     }
 } 

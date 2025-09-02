@@ -29,6 +29,13 @@ export default {
                     C0: new CFrame(0.003, -1.094, 2.356).mul(CFrame.Angles(0, math.rad(-90), 0))
                 }
             },
+            WM: {
+                1: {
+                    Part0: "Right Arm",
+                    Part1: "Handle",
+                    C0: new CFrame(-0.593, 0.527, -0.99)
+                }
+            }
         },
         
         AmmoData: {
@@ -59,6 +66,7 @@ export default {
                 RandomTilt: 0.05,       
 
                 CameraKick: 3.2,
+                CameraMultiplier: 2.5,
 
                 RecoverySpeed: 20,    
 

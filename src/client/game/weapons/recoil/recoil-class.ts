@@ -46,12 +46,12 @@ export class Recoil {
         const microH = (math.random() - 0.5) * 2 * this.profile.MicroShakeIntensity * 0.3;
         const microV = (math.random() - 0.5) * 2 * this.profile.MicroShakeIntensity * 0.3;
 
-        const recoilH = (h + randomH) * shotMultiplier;
-        const recoilV = (v + randomV) * shotMultiplier;
+        const recoilH = (h + randomH) * shotMultiplier * this.profile.CameraMultiplier;
+        const recoilV = (v + randomV) * shotMultiplier * this.profile.CameraMultiplier;
 
         this.cameraSpring.Shove(new Vector3(recoilV, recoilH, 0));
-        this.cameraShakeSpring.Shove(new Vector3(randomH * 2, randomV * 2, 0));
-        this.cameraMicroShakeSpring.Shove(new Vector3(microH, microV, 0));
+        this.cameraShakeSpring.Shove(new Vector3(randomH * 2, randomV * 2, 0).mul(this.profile.CameraMultiplier));
+        this.cameraMicroShakeSpring.Shove(new Vector3(microH, microV, 0).mul(this.profile.CameraMultiplier));
 
         const tiltMultiplier = this.profile.ViewmodelTilt;
         const kickMultiplier = this.profile.ViewmodelKick;
@@ -83,11 +83,11 @@ export class Recoil {
         this.viewmodelShakeSpring.Shove(new Vector3(randomV * 3, randomH * 3, roll));
         this.viewmodelMicroShakeSpring.Shove(new Vector3(microV, microH, roll));
 
-        const kickPower = this.profile.CameraKick;
+        const kickPower = this.profile.CameraKick * this.profile.CameraMultiplier;
         const kickPos = new Vector3(
             (math.random() - 0.5) * 0.2 * kickPower,
             (math.random() - 0.5) * 0.2 * kickPower, 
-            0.5 * kickPower                           
+            0.5 * kickPower
         );
         const kickRot = new Vector3(
             (math.random() - 0.5) * 2 * kickPower,  

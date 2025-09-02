@@ -54,6 +54,12 @@ export class WeaponController implements OnStart, OnRender {
     private isFiring = false;
     private isDebugOpen = Iris.State(false);
     private currentWeapon: Weapon | undefined = undefined; // maybe make player controller's current weapon also be the weapon itself?
+   
+    public weapons: { [key: string]: Weapon } = {};
+
+    GetEquippedWeapon() {
+        return this.currentWeapon;
+    }
 
     private InitializeInputs() {
           // to improve?
@@ -65,21 +71,25 @@ export class WeaponController implements OnStart, OnRender {
         });
 
         this.inputController.Bind("Fire", Enum.UserInputType.MouseButton1, true, (input, ended) => {
+            if (!this.currentWeapon || this.currentWeapon.IsEquipped() === false) return;
+
             if (ended) {
                 this.isFiring = false;
-                RecoilProfile.reset(this.currentWeapon!.recoilProfileAds);
-                RecoilProfile.reset(this.currentWeapon!.recoilProfileHip);
+                RecoilProfile.reset(this.currentWeapon.recoilProfileAds);
+                RecoilProfile.reset(this.currentWeapon.recoilProfileHip);
             }
             else {
-                if (this.currentWeapon?.data.Automatic === true) 
+                if (this.currentWeapon.data.Automatic === true) 
                     this.isFiring = true;
                 
-                this.currentWeapon?.Fire();
+                this.currentWeapon.Fire();
             }
         });
 
         this.inputController.Bind("Aim", Enum.UserInputType.MouseButton2, true, (input, ended) => {
-            this.currentWeapon?.Aim(!ended);
+            if (!this.currentWeapon || this.currentWeapon.IsEquipped() === false) return;
+
+            this.currentWeapon.Aim(!ended);
             UITil.Crosshair(ended);
 
             TweenService.Create(Workspace.CurrentCamera!, new TweenInfo(0.15, Enum.EasingStyle.Sine), {
@@ -88,14 +98,20 @@ export class WeaponController implements OnStart, OnRender {
         })
 
         this.inputController.Bind("Reload", Enum.KeyCode.R, false, () => {
-            this.currentWeapon?.Reload();
+            if (!this.currentWeapon || this.currentWeapon.IsEquipped() === false) return;
+
+            this.currentWeapon.Reload();
         });
 
         this.inputController.Bind("Inspect", Enum.KeyCode.B, false, () => {
-            this.currentWeapon?.Inspect();
+            if (!this.currentWeapon || this.currentWeapon.IsEquipped() === false) return;
+
+            this.currentWeapon.Inspect();
         });
 
         this.inputController.Bind("Debug", Enum.KeyCode.K, false, () => {
+            if (!this.currentWeapon || this.currentWeapon.IsEquipped() === false) return;
+
             this.isDebugOpen.set(!this.isDebugOpen.get());
             UserInputService.MouseIconEnabled = this.isDebugOpen.get();
             this.playerController.player.CameraMode = Enum.CameraMode.Classic;
@@ -109,25 +125,29 @@ export class WeaponController implements OnStart, OnRender {
         this.inputController.Init();
 
         // Creating weapons, this is just a test/template so far.
-        this.playerController.weapons["M4A1"] = new Weapon("M4A1", this.playerController, this.viewmodelController) as Weapon;
-        this.EquipWeapon(this.playerController.weapons["M4A1"]);
+        this.weapons["M4A1"] = new Weapon("M4A1", this.playerController, this.viewmodelController) as Weapon;
+        this.EquipWeapon(this.weapons["M4A1"]);
         
         Iris.Init();
         Iris.Connect(() => {
             Iris.Window([ "Config" ], { isOpened: this.isDebugOpen });
-                createCollapsingHeader("Hipfire", this.currentWeapon!.recoilProfileHip);
-                createCollapsingHeader("ADS", this.currentWeapon!.recoilProfileAds);
+                if (this.currentWeapon && this.currentWeapon.IsEquipped() === true) {
+                    createCollapsingHeader("Hipfire", this.currentWeapon.recoilProfileHip);
+                    createCollapsingHeader("ADS", this.currentWeapon.recoilProfileAds);
+                }
             Iris.End();
         })    
     }
 
     onRender(dt: number) {
-        const offset = this.currentWeapon?.GetOffset(dt) as CFrame;
+        if (!this.currentWeapon) return;
+
+        const offset = this.currentWeapon.GetOffset(dt) as CFrame;
 
         this.viewmodelController.setViewmodelCFrame(Workspace.CurrentCamera!.CFrame.mul(offset));
         this.viewmodelController.updateFakeCamera();
 
-        if (this.isFiring && UserInputService.IsMouseButtonPressed(Enum.UserInputType.MouseButton1))
-            this.currentWeapon?.Fire();
+        if (this.isFiring && UserInputService.IsMouseButtonPressed(Enum.UserInputType.MouseButton1) && this.currentWeapon.CanFire() === true)
+            this.currentWeapon.Fire();
     }
 }

@@ -3,12 +3,13 @@ import { atom } from "@rbxts/charm";
 import { ServerSyncer } from "@rbxts/charm-sync";
 import { Players } from "@rbxts/services";
 import { NewPlayer } from "server/game/players/player-class";
+import { gameState } from "server/game/state/game-state";
 import { Message, messaging } from "shared/game/messaging";
 
 import CharmSync from "@rbxts/charm-sync";
-import atoms from "shared/game/data/atoms";
+// TODO: make this 1 module
+import atoms from "shared/game/data/player-atoms";
 
-// shout ot to l.iquid on discord for being a big helper and support and i will always appreciate his work
 let playerSyncers = new Map<Player, ServerSyncer<{}, true>>();
 
 function SetupSyncerForState(player: Player, state: typeof atoms) {
@@ -30,6 +31,17 @@ export class PlayerService implements OnStart {
     registeredPlayers: { [key: string]: NewPlayer } = {};
 
     onStart() {
+        // game state
+        const gameSyncer = CharmSync.server({
+            atoms: gameState
+        });
+
+        gameSyncer.connect((_, payload) => {
+            for (const [player] of playerSyncers) {
+                messaging.client.emit(player, Message.gameSessionSync, payload);
+            }
+        });
+
         messaging.server.on(Message.requestSessionState, player => {
             playerSyncers.get(player)?.hydrate(player);
         })
@@ -41,6 +53,8 @@ export class PlayerService implements OnStart {
             this.registeredPlayers[player.Name] = playerClass;
 
             SetupSyncerForState(player, playerState);
+
+            gameSyncer.hydrate(player);
         })
         
         Players.PlayerRemoving.Connect((player) => {

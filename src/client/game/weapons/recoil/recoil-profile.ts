@@ -31,11 +31,10 @@ export type Config = {
     ViewmodelMultiplier?: number
 
     CameraKick?: number
+    CameraMultiplier?: number
 
     ContinuousFireMultiplier?: number
     MicroShakeIntensity?: number
-
-    RPM?: number
 }
 
 export type RecoilProfileType = {
@@ -71,6 +70,7 @@ export type RecoilProfileType = {
     ViewmodelMultiplier: number
 
     CameraKick: number
+    CameraMultiplier: number
 
     ContinuousFireMultiplier: number
     MicroShakeIntensity: number
@@ -113,6 +113,7 @@ const DEFAULT_PROFILE: RecoilProfileType = {
     ViewmodelMultiplier: 1.0,
 
     CameraKick: 0.5,
+    CameraMultiplier: 2,
 
     ContinuousFireMultiplier: 1.0,
     MicroShakeIntensity: 1.5,

@@ -1,21 +1,26 @@
+import { Controller, OnStart } from "@flamework/core";
 import { Players } from "@rbxts/services";
-import { messaging, Message } from "shared/game/messaging";
-import { Controller, OnStart } from "@flamework/core"
+import { Message, messaging } from "shared/game/messaging";
+import { UITil } from "../modules/ui-til";
 
 import CharmSync from "@rbxts/charm-sync";
-import atoms from "shared/game/data/atoms";
 
-import { Weapon } from "../weapons/weapon-type";
+import gameAtoms from "shared/game/data/game-atoms";
+import atoms from "shared/game/data/player-atoms";
 
 @Controller()
 export class PlayerController implements OnStart {
     public player = Players.LocalPlayer;
-    public replicatedPlayerState = table.clone(atoms); 
 
-    public weapons: { [key: string]: Weapon } = {};
+    public replicatedPlayerState = table.clone(atoms); 
+    public replicatedGameState = table.clone(gameAtoms);
 
     private syncer = CharmSync.client({
         atoms: this.replicatedPlayerState
+    });
+
+    private gameSyncer = CharmSync.client({
+        atoms: this.replicatedGameState
     });
 
     private state : { [key: string]: string | undefined } = {
@@ -25,6 +30,12 @@ export class PlayerController implements OnStart {
     onStart() {
         messaging.client.on(Message.playerSessionSync, payload => {
             this.syncer.sync(payload);
+        });
+
+        messaging.client.on(Message.gameSessionSync, payload => {
+            this.gameSyncer.sync(payload);
+
+            UITil.UpdateTake(payload.data.take!);
         });
 
         messaging.server.emit(Message.requestSessionState);

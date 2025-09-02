@@ -20,8 +20,6 @@ export namespace WeaponUtil {
     }
 }
 
-const RNG = new Random();
-
 export class Weapon {
     public name;
 
@@ -57,8 +55,9 @@ export class Weapon {
     private rigMotors = new Map<string, { motor: Motor6D; baseC0: CFrame }>();
 
     constructor(readonly weaponName: keyof typeof weapons, protected playerController: PlayerController, protected viewmodelController: ViewmodelController) {        
-        if (!messaging.server.invoke(Message.createWeapon, Message.createWeaponReturn, { weaponName: weaponName })) throw `Weapon ${weaponName} does not exist!`;
-        
+        const canCreate = messaging.server.invoke(Message.createWeapon, Message.createWeaponReturn, { weaponName: weaponName }).await()[1];
+        if (canCreate === false) throw `Weapon ${weaponName} does not exist!`;
+
         this.name = weaponName;
         this.data = weapons[weaponName];
         this.cooldown = 1 / (this.data.RPM / 60);
@@ -76,7 +75,7 @@ export class Weapon {
         this.InitializeSounds();
     }
 
-    InitializeAnimations() {
+    private InitializeAnimations() {
         for (const anim of this.model.FindFirstChild("Animations")!.FindFirstChild("VM")!.GetChildren()) {
             if (anim.IsA("Animation") === false) continue;
 
@@ -84,7 +83,7 @@ export class Weapon {
         }
     }
 
-    InitializeSounds() {
+    private InitializeSounds() {
         for (const sound of this.model.FindFirstChild("Sounds")!.GetChildren()) {
             if (sound.IsA("Sound") === false) continue;
 
@@ -92,7 +91,7 @@ export class Weapon {
         }
     }
 
-    InitializeRig() {
+    private InitializeRig() {
         const rig = this.data.Rig;
 
         for (const [key, data] of pairs(rig.VM)) {
@@ -118,6 +117,9 @@ export class Weapon {
         if (this.state.isEquipped === true) return false;
         if (this.playerController.DoesPlayerHaveAWeaponEquipped()) return false;
 
+        const canEquip = messaging.server.invoke(Message.equipWeapon, Message.equipWeaponReturn, { weaponName: this.name }).await()[1];
+        if (!canEquip) return;
+
         this.playerController.EquipWeapon(this.name);
         this.state.isEquipped = true;
 
@@ -130,8 +132,6 @@ export class Weapon {
         task.delay(this.data.EquipTime, () => {
             this.state.isEnabled = true;
         })
-
-        this.sounds.Equip.Play();
 
         return true;
     }   
@@ -160,10 +160,17 @@ export class Weapon {
         })
     }
 
+    CanFire() {
+        return this.state.canFire;
+    }
+
     Fire() {
         if (this.state.isEnabled === false) return;
         if (this.state.isEquipped === false) return;
         if (this.state.canFire === false) return;
+
+        const canFire = messaging.server.invoke(Message.fireWeapon, Message.fireWeaponReturn, { startCFrame: CFrame.identity }, true).await()[1];
+        if (!canFire) return;
 
         this.state.canFire = false;
         task.delay(this.cooldown, () => {
@@ -172,16 +179,6 @@ export class Weapon {
 
         this.animations.Fire.Play();
         this.recoil.Fire();
-
-        /* TODO MAKE THIS IN THE SERVER */
-        const fireSound = this.sounds.Fire.Clone();
-        fireSound.Parent = this.playerController.player.Character?.PrimaryPart;
-        fireSound.PlaybackSpeed = RNG.NextNumber(0.9, 1.2);
-        fireSound.Play();
-
-        fireSound.Ended.Connect(() => {
-            fireSound.Destroy();
-        })
     }
 
     Reload() {
