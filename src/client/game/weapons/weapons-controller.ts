@@ -16,7 +16,7 @@ function createCollapsingHeader(name: string, profile: RecoilProfileType) {
         if (key === "RPM" || key === "ShotIndex") continue;
 
         const state = Iris.State(value);
-        Iris.InputNum([ key, 0.01 ], { number: state });
+        Iris.InputNum([ key, 0.0001 ], { number: state });
 
         profile[key] = state.get();
     }

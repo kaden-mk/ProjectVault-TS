@@ -169,16 +169,18 @@ export class Weapon {
         if (this.state.isEquipped === false) return;
         if (this.state.canFire === false) return;
 
-        const canFire = messaging.server.invoke(Message.fireWeapon, Message.fireWeaponReturn, { startCFrame: CFrame.identity }, true).await()[1];
-        if (!canFire) return;
+        const handle = this.model.FindFirstChild("Handle") as BasePart;
+        const gunFirePoint = handle.FindFirstChild("GunFirePoint") as Attachment;
 
         this.state.canFire = false;
-        task.delay(this.cooldown, () => {
-            this.state.canFire = true;
-        })
 
         this.animations.Fire.Play();
         this.recoil.Fire();
+
+        messaging.server.emit(Message.fireWeapon, { startCFrame: gunFirePoint.WorldCFrame }, true);
+        task.delay(this.cooldown, () => {
+            this.state.canFire = true;
+        })
     }
 
     Reload() {

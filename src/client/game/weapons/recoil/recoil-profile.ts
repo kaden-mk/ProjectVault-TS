@@ -27,6 +27,8 @@ export type Config = {
     IntensityMultiplier?: number
 
     ViewmodelKick?: number
+    ViewmodelKickSpeed?: number
+    ViewmodelKickLimit?: number
     ViewmodelTilt?: number
     ViewmodelMultiplier?: number
 
@@ -66,6 +68,8 @@ export type RecoilProfileType = {
     IntensityMultiplier: number
 
     ViewmodelKick: number
+    ViewmodelKickSpeed: number
+    ViewmodelKickLimit: number
     ViewmodelTilt: number
     ViewmodelMultiplier: number
 
@@ -109,6 +113,8 @@ const DEFAULT_PROFILE: RecoilProfileType = {
     IntensityMultiplier: 1.0,
 
     ViewmodelKick: 1.0,
+    ViewmodelKickSpeed: 6.0,
+    ViewmodelKickLimit: 3,
     ViewmodelTilt: 0.0,
     ViewmodelMultiplier: 1.0,
 

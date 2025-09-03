@@ -46,59 +46,48 @@ export default {
         
         Recoil: {
             Hip: {
-                CameraStiffness: 350,
-                CameraDamping: 25,
-
-                VerticalBase: 0.9,      
-                HorizontalBase: 0.2,     
-                VerticalRamp: 0.05,      
-                HorizontalRamp: 0.02,   
-
-                VerticalScale: 1.0,
-                HorizontalScale: 1.0,
-
-                HorizontalBias: 0.0,     
-                TiltBias: 0.05,        
-                RollBias: -0.08,        
-                VerticalBias: 0.08,     
-
-                RandomJitter: 0.12,     
-                RandomTilt: 0.05,       
-
-                CameraKick: 3.2,
+                CameraStiffness: 400,
+                CameraDamping: 22,
+                VerticalBase: 1.6,
+                HorizontalBase: 0.05,
+                VerticalRamp: 0.06,
+                HorizontalRamp: 0.005,
+                VerticalScale: 1.2,
+                HorizontalScale: 0.25,
+                HorizontalBias: 0.0,
+                TiltBias: 0.01,        
+                RollBias: -0.02,
+                VerticalBias: 0.05,     
+                RandomJitter: 0.01,    
+                RandomTilt: 0.002,
+                CameraKick: 3.6,
                 CameraMultiplier: 2.5,
-
-                RecoverySpeed: 20,    
-
+                RecoverySpeed: 24,
                 PatternScale: 1.0,
                 IntensityMultiplier: 1.0,
-
-                ViewmodelKick: 8,
-                ViewmodelTilt: 6,
-                ViewmodelMultiplier: 1.2,
-
-                ContinuousFireMultiplier: 1.4,
-                MicroShakeIntensity: 0.5,
+                ViewmodelKick: 5,    
+                ViewmodelKickLimit: 6.5,
+                ViewmodelTilt: 0.2,     
+                ViewmodelMultiplier: 0.25,
+                ContinuousFireMultiplier: 1.0,
+                MicroShakeIntensity: 0.02, 
+                ViewmodelKickSpeed: 55,    
             },
             Ads: {
-                VerticalBase: 0.6,       
-                HorizontalBase: 0.12,   
-                VerticalRamp: 0.03,
-                HorizontalRamp: 0.01,
-
-                RecoverySpeed: 15,     
-
-                //RollBias: -0.04,        
-                VerticalBias: 0.04,      
-
-                RandomJitter: 0.06,      
-                RandomTilt: 0.02,        
-
+                VerticalBase: 0.9,
+                HorizontalBase: 0.015,
+                HorizontalRamp: 0.001,
+                VerticalRamp: 0.04,
+                RecoverySpeed: 14,
+                VerticalBias: 0.05,
+                HorizontalBias: -0.005,
+                RandomJitter: 0.005,   
                 ViewmodelKick: 3,
-                ViewmodelTilt: 4,
-                ViewmodelMultiplier: 1, // this does nothing?
-
-                ContinuousFireMultiplier: 1.2,
+                RandomTilt: 0.001,
+                ViewmodelKickLimit: 1.5,
+                ViewmodelTilt: 0.15,   
+                ViewmodelMultiplier: 0.2,
+                ContinuousFireMultiplier: 1.0
             }
         },
 

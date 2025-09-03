@@ -43,7 +43,7 @@ export class WeaponService implements OnStart {
             return weapon.Equip();
         });
 
-        messaging.server.setCallback(Message.fireWeapon, Message.fireWeaponReturn, (player, data) => {
+        messaging.server.on(Message.fireWeapon, (player, data) => {
             if (!this.weapons[player.Name]) return false;
             
             const playerClass = this.playerService.GetPlayer(player);

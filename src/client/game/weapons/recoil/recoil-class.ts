@@ -5,9 +5,9 @@ export class Recoil {
     private continousFireTime = 0;
 
     // base springs
-    private cameraSpring;
-    private viewmodelSpringPos;
-    private viewmodelSpringRot;
+    private cameraSpring = new Spring();
+    private viewmodelSpringPos = new Spring();
+    private viewmodelSpringRot = new Spring();
 
     // shake springs
     private cameraShakeSpring = new Spring(700, 50);
@@ -17,20 +17,18 @@ export class Recoil {
     private cameraMicroShakeSpring = new Spring(1200, 65);
     private viewmodelMicroShakeSpring = new Spring(1400, 60);
 
-    private cameraKickSpring = new Spring(2000, 50);
+    private cameraKickSpring = new Spring(2500, 40);
 
     constructor(private camera: Camera, private profile: RecoilProfileType) {
-        this.cameraSpring = new Spring(profile.CameraStiffness, profile.CameraDamping);
-        this.viewmodelSpringPos = new Spring(profile.ViewmodelKick * 15, profile.RecoverySpeed * 0.8);
-        this.viewmodelSpringRot = new Spring(profile.ViewmodelTilt * 15, profile.RecoverySpeed * 0.6);
+        this.SwitchProfile(profile);
     }
 
     SwitchProfile(newProfile: RecoilProfileType) {
         this.profile = newProfile;
 
-        this.cameraSpring.Change(this.profile.CameraStiffness, this.profile.CameraDamping);
-        this.viewmodelSpringPos.Change(this.profile.ViewmodelKick * 15, this.profile.RecoverySpeed * 0.8);
-        this.viewmodelSpringRot.Change(this.profile.ViewmodelTilt * 15, this.profile.RecoverySpeed * 0.6);
+        this.cameraSpring.Change(this.profile.CameraStiffness * 2, this.profile.CameraDamping);
+        this.viewmodelSpringPos.Change(this.profile.ViewmodelKick * this.profile.ViewmodelKickSpeed, this.profile.RecoverySpeed * 0.5);
+        this.viewmodelSpringRot.Change(this.profile.ViewmodelTilt * 80, this.profile.RecoverySpeed * 0.35);
     }
 
     Fire() {
@@ -43,13 +41,13 @@ export class Recoil {
 
         const randomH = (math.random() - 0.5) * 2 * this.profile.HorizontalPower * 0.4;
         const randomV = (math.random() - 0.5) * 2 * this.profile.VerticalPower * 0.4;
-        const microH = (math.random() - 0.5) * 2 * this.profile.MicroShakeIntensity * 0.3;
-        const microV = (math.random() - 0.5) * 2 * this.profile.MicroShakeIntensity * 0.3;
+        const microH = (math.random() - 0.5) * 2 * this.profile.MicroShakeIntensity * 0.2;
+        const microV = (math.random() - 0.5) * 2 * this.profile.MicroShakeIntensity * 0.2;
 
         const recoilH = (h + randomH) * shotMultiplier * this.profile.CameraMultiplier;
         const recoilV = (v + randomV) * shotMultiplier * this.profile.CameraMultiplier;
 
-        this.cameraSpring.Shove(new Vector3(recoilV, recoilH, 0));
+        this.cameraSpring.Shove(new Vector3(recoilH, recoilV, 0));
         this.cameraShakeSpring.Shove(new Vector3(randomH * 2, randomV * 2, 0).mul(this.profile.CameraMultiplier));
         this.cameraMicroShakeSpring.Shove(new Vector3(microH, microV, 0).mul(this.profile.CameraMultiplier));
 
@@ -66,19 +64,22 @@ export class Recoil {
         pitchTilt += randomV * 0.5 * tiltMultiplier;
         yawTilt   += randomH * 0.5 * tiltMultiplier;
 
-        const rollTilt = ((roll + randomV * 1.2) - (this.profile.RollBias ?? 0)) * tiltMultiplier * 0.6;
+        const rollTilt = ((roll + randomV * 1.2) - (this.profile.RollBias)) * tiltMultiplier * 0.6;
 
         this.viewmodelSpringRot.Shove(new Vector3(
-            pitchTilt,
-            yawTilt,
-            rollTilt
+            pitchTilt * 1.3,
+            yawTilt * 1.3,
+            rollTilt * 1.3
         ));
 
-        this.viewmodelSpringPos.Shove(new Vector3(
+        const baseKick = new Vector3(
             -h * 0.12 * vmMultiplier,
             -v * 0.08 * vmMultiplier,
             1.2 * kickMultiplier
-        ));
+        );
+
+        this.viewmodelSpringPos.target = Vector3.zero;
+        this.viewmodelSpringPos.Shove(baseKick);
 
         this.viewmodelShakeSpring.Shove(new Vector3(randomV * 3, randomH * 3, roll));
         this.viewmodelMicroShakeSpring.Shove(new Vector3(microV, microH, roll));
@@ -95,7 +96,7 @@ export class Recoil {
             (math.random() - 0.5) * 2 * kickPower    
         );
 
-        this.cameraKickSpring.Shove(kickPos.add(kickRot));
+        this.cameraKickSpring.Shove(kickPos.add(kickRot).mul(1.5));
     }
 
     // return the cframe needed to update the viewmodel position
@@ -122,7 +123,7 @@ export class Recoil {
         const clampedPosition = new Vector3(
             math.clamp(finalPosition.X, -1.5, 1.5),
             math.clamp(finalPosition.Y, -1, 1),
-            math.clamp(finalPosition.Z, -0.65, 0.65)
+            math.clamp(finalPosition.Z, -this.profile.ViewmodelKickLimit, this.profile.ViewmodelKickLimit)
         );
         const finalRotation = CFrame.Angles(
             math.rad(-vmRot.X + vmShake.X * 25 + vmMicro.X * 10),

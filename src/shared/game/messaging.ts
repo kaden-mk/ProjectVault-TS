@@ -17,7 +17,6 @@ export const enum Message {
   unequipWeapon,
   unequipWeaponReturn,
   fireWeapon,
-  fireWeaponReturn,
   reloadWeapon,
   reloadWeaponReturn,
   requestSessionState,
@@ -35,7 +34,6 @@ export interface MessageData {
   [Message.equipWeapon]: { readonly weaponName: keyof typeof weapons };
   [Message.equipWeaponReturn]: boolean;
   [Message.fireWeapon]: { readonly startCFrame: CFrame };
-  [Message.fireWeaponReturn]: boolean;
 
   /* session */
   [Message.requestSessionState]: undefined,
