@@ -119,14 +119,14 @@ export class WeaponController implements OnStart, OnRender {
     }
 
     onStart() {
-        UserInputService.MouseIconEnabled = false;
+        //UserInputService.MouseIconEnabled = false;
 
         this.InitializeInputs();
         this.inputController.Init();
 
-        // Creating weapons, this is just a test/template so far.
+        /*
         this.weapons["M4A1"] = new Weapon("M4A1", this.playerController, this.viewmodelController) as Weapon;
-        this.EquipWeapon(this.weapons["M4A1"]);
+        this.EquipWeapon(this.weapons["M4A1"]);*/
         
         Iris.Init();
         Iris.Connect(() => {

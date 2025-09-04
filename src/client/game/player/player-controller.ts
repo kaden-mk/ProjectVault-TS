@@ -1,9 +1,9 @@
 import { Controller, OnStart } from "@flamework/core";
 import { Players } from "@rbxts/services";
 import { Message, messaging } from "shared/game/messaging";
-import { UITil } from "../modules/ui-til";
 
 import CharmSync from "@rbxts/charm-sync";
+import Signal from "@rbxts/signal";
 
 import gameAtoms from "shared/game/data/game-atoms";
 import atoms from "shared/game/data/player-atoms";
@@ -14,6 +14,8 @@ export class PlayerController implements OnStart {
 
     public replicatedPlayerState = table.clone(atoms); 
     public replicatedGameState = table.clone(gameAtoms);
+
+    public gameStateUpdated = new Signal();
 
     private syncer = CharmSync.client({
         atoms: this.replicatedPlayerState
@@ -32,10 +34,10 @@ export class PlayerController implements OnStart {
             this.syncer.sync(payload);
         });
 
+        // TODO: add a signal to this
         messaging.client.on(Message.gameSessionSync, payload => {
             this.gameSyncer.sync(payload);
-
-            UITil.UpdateTake(payload.data.take!);
+            this.gameStateUpdated.Fire();
         });
 
         messaging.server.emit(Message.requestSessionState);

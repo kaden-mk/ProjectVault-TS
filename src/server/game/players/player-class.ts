@@ -45,4 +45,16 @@ export class NewPlayer {
     GetEquippedWeapon() {
         return this.state.equippedWeapon;
     }
+
+    LoadCharacter(character: Model, cframe?: CFrame | BasePart) {
+        const clone = character.Clone();
+        clone.Name = this.player.Name;
+        this.player.Character = clone;
+        this.player.Character.Parent = game.Workspace;
+        
+        if (cframe) {
+            const pivotCFrame = typeOf(cframe) === "CFrame" ? (cframe as CFrame) : (cframe as BasePart).CFrame;
+            this.player.Character.PivotTo(pivotCFrame);
+        }
+    }
 }

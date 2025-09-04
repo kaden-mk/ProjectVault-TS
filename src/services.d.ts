@@ -15,6 +15,10 @@ interface ReplicatedStorage {
 
         Weapons: Folder & {
             [key: string]: Model
+        },
+
+        Characters: Folder & {
+            [key: string]: Model
         }
     }
 }

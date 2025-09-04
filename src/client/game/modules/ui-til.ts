@@ -3,21 +3,21 @@ import { Players, RunService, TweenService } from "@rbxts/services";
 
 const player = Players.LocalPlayer;
 
-const playerGui = player.WaitForChild("PlayerGui") as PlayerGui;
-const mainGui = playerGui.WaitForChild("MainGui") as ScreenGui;
-
-const interactionFrame = mainGui.WaitForChild("Interact") as Frame;
-const interactionLabel = interactionFrame.WaitForChild("Text") as TextLabel;
-const interactionBackground = interactionFrame.WaitForChild("Background") as Frame;
-const interactionProgress = interactionFrame.WaitForChild("Progress") as Frame;
-
-const topLeft = mainGui.WaitForChild("TopLeft") as Frame & {
-    TextLabel: TextLabel
-};
-
-const crosshair = mainGui.WaitForChild("Crosshair") as ImageLabel;
+//StarterGui.WaitForChild("MainGui").Clone().Parent = Players.LocalPlayer.WaitForChild("PlayerGui");
 
 export namespace UITil {
+    const playerGui = player.WaitForChild("PlayerGui") as PlayerGui;
+    const mainGui = playerGui.WaitForChild("MainGui") as GameGui;
+
+    const interactionFrame = mainGui.Interact;
+    const interactionLabel = interactionFrame.Text;
+    const interactionBackground = interactionFrame.Background;
+    const interactionProgress = interactionFrame.Progress;
+
+    const topLeft = mainGui.TopLeft;
+
+    const crosshair = mainGui.Crosshair;
+
     export function UpdateInteractionText(text: string | undefined) {
         if (!text) {
             interactionLabel.Visible = false;
@@ -68,5 +68,33 @@ export namespace UITil {
             }
             currentTake = last;
         });
+    }
+
+    export function Fade(frame: Frame, ior: "out" | "in") {
+        TweenService.Create(frame, new TweenInfo(1), {
+            BackgroundTransparency: 1
+        }).Play()
+
+        const items = [ "TextButton", "Frame", "TextLabel" ]
+
+        for (const [_, item] of pairs(frame.GetChildren())) {
+            if (!items.includes(item.ClassName)) continue;
+
+            const transparency = ior === "out" ? 1 : 0
+
+            type tweenData = {
+                BackgroundTransparency: number
+                TextTransparency?: number
+            }
+
+            const data: tweenData = {
+                BackgroundTransparency: transparency
+            }
+
+            if (item.ClassName === "TextButton" || item.ClassName === "TextLabel")
+                data.TextTransparency = transparency
+
+            TweenService.Create(item, new TweenInfo(1), data as never).Play()
+        }
     }
 } 

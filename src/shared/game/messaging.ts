@@ -25,6 +25,7 @@ export const enum Message {
   startInteraction,
   startInteractionReturn,
   cancelInteraction,
+  playerReadyUp
 }
 
 export interface MessageData {
@@ -44,4 +45,7 @@ export interface MessageData {
   [Message.startInteraction]: { readonly interaction: Instance };
   [Message.startInteractionReturn]: boolean;
   [Message.cancelInteraction]: undefined;
+
+  /* player */
+  [Message.playerReadyUp]: undefined;
 }
