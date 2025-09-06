@@ -2,7 +2,7 @@ import { OnStart, Service } from "@flamework/core";
 import { atom } from "@rbxts/charm";
 import { ServerSyncer } from "@rbxts/charm-sync";
 import { Players, ReplicatedStorage, StarterPlayer } from "@rbxts/services";
-import { NewPlayer } from "server/game/players/player-class";
+import { NewPlayer, RemovePlayer } from "server/game/players/player-class";
 import { gameState } from "server/game/state/game-state";
 import { Message, messaging } from "shared/game/messaging";
 import { HeistController } from "../heists/heists";
@@ -13,7 +13,6 @@ import CharmSync from "@rbxts/charm-sync";
 import atoms from "shared/game/data/player-atoms";
 
 const playerSyncers = new Map<Player, ServerSyncer<{}, true>>();
-const playerStates = new Map<Player, typeof atoms>();
 
 function SetupSyncerForState(player: Player, state: typeof atoms) {
     const syncer = CharmSync.server({
@@ -29,19 +28,8 @@ const ConstructNewPlayerState = () => ({
     masked: atom(false)
 }) satisfies typeof atoms;
 
-export function GetPlayerState(player: Player) {
-    return playerStates.get(player);
-}
-
-const registeredPlayers: { [key: string]: NewPlayer } = {};
-
-export function GetRegisteredPlayer(player: Player) {
-    return registeredPlayers[player.Name];
-}
-
 @Service()
 export class PlayerService implements OnStart {
-
     constructor(private heistController: HeistController) {}
 
     onStart() {
@@ -88,10 +76,7 @@ export class PlayerService implements OnStart {
 
             // player & game state
             const playerState = ConstructNewPlayerState();
-            playerStates.set(player, playerState);
-
             const playerClass = new NewPlayer(player, playerState);
-            registeredPlayers[player.Name] = playerClass;
 
             playerClass.LoadCharacter(ReplicatedStorage.Assets.Characters.Default, this.heistController.map?.WaitForChild("SpawnLocation") as SpawnLocation);
 
@@ -101,7 +86,7 @@ export class PlayerService implements OnStart {
         })
         
         Players.PlayerRemoving.Connect((player) => {
-            delete registeredPlayers[player.Name];
+            RemovePlayer(player);
         })
     }
 }

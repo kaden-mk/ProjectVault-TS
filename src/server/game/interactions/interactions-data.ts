@@ -1,4 +1,5 @@
-import { GetPlayerStateInteraction as GetPlayerState, Interaction } from "server/game/interactions/interactions";
+import { Interaction } from "server/game/interactions/interactions";
+import { NewPlayer } from "../players/player-class";
 
 import { gameState } from "../state/game-state";
 
@@ -48,12 +49,12 @@ export default {
         }
     },
     "Mask": {
-        callback: (object: Interaction, interactionType: string | undefined, player: Player) => {
+        callback: (object: Interaction, interactionType: string | undefined, player: NewPlayer) => {
+            if (object.id !== `Mask_Equip_${player.player.Name}`) return;
+
             if (interactionType === "End") {
                 object.destroy();
-
-                const playerState = GetPlayerState(player);
-                playerState?.masked(true);
+                player.atomState.masked(true);
             }
         }
     }

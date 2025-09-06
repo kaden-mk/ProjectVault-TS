@@ -1,5 +1,5 @@
 import { HttpService } from "@rbxts/services";
-import { GetPlayerState, GetRegisteredPlayer } from "../players/player-service";
+import { GetPlayer } from "../players/player-class";
 
 import interactionsServer from "server/game/interactions/interactions-data";
 import interactionsShared from "shared/game/data/interactions";
@@ -10,13 +10,9 @@ export function GetInteractionFromId(id: string) {
     return interactions[id];
 }
 
-export function GetPlayerStateInteraction(player: Player) {
-    return GetPlayerState(player);
-}   
-
 export class Interaction {
     private data;
-    private readonly id;
+    readonly id;
     
     instance?: Instance;
     private callback;
@@ -54,17 +50,18 @@ export class Interaction {
     public onInteract(player: Player) {
         if (!this.isPlayerNearby(player)) return false;
 
-        const playerData = GetRegisteredPlayer(player);
+        const playerData = GetPlayer(player);
 
         if (!playerData) return false;
         if (playerData.state.activeInteraction) return false;
+        if (playerData.atomState.masked() === false && this.data.Mask === true) return false;
 
         if (this.data.Type === "Instant") {
-            this.callback?.(this as any, undefined, player);
+            this.callback?.(this as any, undefined, playerData);
             return false;
         }
 
-        if (this.callback && this.callback(this as any, "Start", player) === false) return false;
+        if (this.callback && this.callback(this as any, "Start", playerData) === false) return false;
 
         playerData.state.activeInteraction = this.id;
 
@@ -90,14 +87,14 @@ export class Interaction {
             if (!go) return;
 
             playerData.state.activeInteraction = undefined;
-            this.callback?.(this as any, "End", player);
+            this.callback?.(this as any, "End", playerData);
         });
 
         return true;
     }
 
     public cancelInteraction(player: Player) {
-        const playerData = GetRegisteredPlayer(player);
+        const playerData = GetPlayer(player);
 
         if (playerData === undefined) return;
         if (playerData.state.activeInteraction !== this.id) return;

@@ -1,5 +1,15 @@
 import atoms from "shared/game/data/player-atoms";
 
+export function GetPlayer(player: Player) {
+    return playerClasses.get(player);
+}
+
+export function RemovePlayer(player: Player) {
+    playerClasses.delete(player);
+}
+
+const playerClasses = new Map<Player, NewPlayer>();
+
 export class NewPlayer {
     readonly player;
 
@@ -25,6 +35,8 @@ export class NewPlayer {
             M4A1: true,
             M1911: true
         };
+
+        playerClasses.set(playerItem, this);
     }
 
     EquipWeapon(weapon: string) {

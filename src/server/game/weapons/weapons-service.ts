@@ -1,7 +1,7 @@
 import { OnStart, Service } from "@flamework/core";
 import { Weapon } from "server/game/weapons/weapons-class";
 import { Message, messaging } from "shared/game/messaging";
-import { GetRegisteredPlayer } from "../players/player-service";
+import { GetPlayer } from "../players/player-class";
 
 @Service()
 export class WeaponService implements OnStart {
@@ -13,7 +13,7 @@ export class WeaponService implements OnStart {
             if (this.weapons[player.Name][data.weaponName]) return false;
 
             const weaponName = data.weaponName;
-            const playerClass = GetRegisteredPlayer(player);
+            const playerClass = GetPlayer(player);
             
             if (playerClass === undefined) return false;
             if (playerClass.inventory.weapons[weaponName] === undefined) return false;
@@ -34,7 +34,7 @@ export class WeaponService implements OnStart {
 
             const weapon = this.weapons[player.Name][data.weaponName];
 
-            const playerClass = GetRegisteredPlayer(player);
+            const playerClass = GetPlayer(player);
             if (!playerClass) return false;
             if (playerClass.GetEquippedWeapon() === data.weaponName) return false;
 
@@ -44,7 +44,7 @@ export class WeaponService implements OnStart {
         messaging.server.on(Message.fireWeapon, (player, data) => {
             if (!this.weapons[player.Name]) return false;
             
-            const playerClass = GetRegisteredPlayer(player);
+            const playerClass = GetPlayer(player);
             if (!playerClass) return false;
             if (playerClass.GetEquippedWeapon() === undefined) return false;
 

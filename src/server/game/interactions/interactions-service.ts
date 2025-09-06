@@ -1,5 +1,5 @@
 import { OnStart, Service } from "@flamework/core";
-import { GetRegisteredPlayer } from "server/game/players/player-service";
+import { GetPlayer } from "server/game/players/player-class";
 import { Message, messaging } from "shared/game/messaging";
 import { GetInteractionFromId } from "./interactions";
 
@@ -20,7 +20,7 @@ export class InteractionsService implements OnStart {
         });
 
         messaging.server.on(Message.cancelInteraction, (player) => {
-            const playerData = GetRegisteredPlayer(player);
+            const playerData = GetPlayer(player);
 
             if (!playerData || !playerData.state.activeInteraction) return;
 

@@ -127,11 +127,8 @@ export class WeaponController implements OnStart, OnRender {
         this.weapons["M4A1"] = new Weapon("M4A1", this.playerController, this.viewmodelController) as Weapon;
 
         this.playerController.onMask.Connect(() => {
-            this.EquipWeapon(this.weapons["M4A1"]);
-        })
-
-        /*
-        this.EquipWeapon(this.weapons["M4A1"]);*/
+            task.delay(0.85, () => this.EquipWeapon(this.weapons["M4A1"]));
+        });
         
         Iris.Init();
         Iris.Connect(() => {
