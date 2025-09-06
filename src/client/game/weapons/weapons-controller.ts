@@ -148,7 +148,7 @@ export class WeaponController implements OnStart, OnRender {
         }
 
         const offset = this.currentWeapon.GetOffset(dt) as CFrame;
-        const bobbingOffsets = this.viewmodelController.getBobbingAndSwayOffsets(dt);
+        const bobbingOffsets = this.viewmodelController.getBobbingAndSwayOffsets(dt, this.playerController.state.running);
 
         this.viewmodelController.setViewmodelCFrame(Workspace.CurrentCamera!.CFrame.mul(offset).mul(bobbingOffsets as CFrame));
         this.viewmodelController.updateFakeCamera();

@@ -26,10 +26,11 @@ export class PlayerController implements OnStart {
         atoms: this.replicatedGameState
     });
 
-    state: { equippedWeapon: string | undefined, currentInteraction: unknown | undefined, masked: boolean } = {
+    state: { equippedWeapon: string | undefined, currentInteraction: unknown | undefined, masked: boolean, running: boolean } = {
         equippedWeapon: undefined,
         currentInteraction: undefined,
-        masked: false
+        masked: false,
+        running: false
     }
 
     onStart() {
