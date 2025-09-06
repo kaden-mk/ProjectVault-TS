@@ -103,12 +103,6 @@ export class Weapon {
             this.state.isFiring = false;
         })
 
-        const part = new Instance("Part");
-        part.CanCollide = false;
-        part.Anchored = true;
-        part.CFrame = startCFrame;
-        part.Parent = game.GetService("Workspace");
-
         const fireSound = this.sounds.Fire.Clone();
         fireSound.Parent = this.owner.player.Character?.PrimaryPart;
         fireSound.PlaybackSpeed = RNG.NextNumber(0.9, 1.2);

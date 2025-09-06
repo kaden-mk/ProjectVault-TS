@@ -148,8 +148,9 @@ export class WeaponController implements OnStart, OnRender {
         }
 
         const offset = this.currentWeapon.GetOffset(dt) as CFrame;
+        const bobbingOffsets = this.viewmodelController.getBobbingAndSwayOffsets(dt);
 
-        this.viewmodelController.setViewmodelCFrame(Workspace.CurrentCamera!.CFrame.mul(offset));
+        this.viewmodelController.setViewmodelCFrame(Workspace.CurrentCamera!.CFrame.mul(offset).mul(bobbingOffsets as CFrame));
         this.viewmodelController.updateFakeCamera();
 
         if (this.isFiring && UserInputService.IsMouseButtonPressed(Enum.UserInputType.MouseButton1) && this.currentWeapon.CanFire() === true)

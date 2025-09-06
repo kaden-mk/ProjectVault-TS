@@ -71,7 +71,7 @@ export class InteractionsController implements OnStart, OnRender {
         const maskInteraction = new Interactable("Mask", `Mask_Equip_${this.playerController.player.Name}`, this.playerController, this.viewmodelController);
 
         maskInteraction.onInteractionEnded.Connect(() => {
-            //this.inputController.Unbind("Mask");
+            this.inputController.Unbind("Mask");
         });
 
         this.inputController.Bind("Mask", Enum.KeyCode.G, true, (input, ended) => {
@@ -83,7 +83,12 @@ export class InteractionsController implements OnStart, OnRender {
     }
 
     onRender() {
-        this.currentInteractable = GetInteractableFromRay();
+        const newInteractable = GetInteractableFromRay();
+
+        if (this.currentInteractable && this.currentInteractable !== newInteractable) 
+            this.currentInteractable.cancelInteraction();
+
+        this.currentInteractable = newInteractable;
 
         UITil.UpdateInteractionText(this.currentInteractable?.getText() || undefined);
 
