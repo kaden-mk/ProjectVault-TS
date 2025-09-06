@@ -1,12 +1,10 @@
 import { OnStart, Service } from "@flamework/core";
 import { Weapon } from "server/game/weapons/weapons-class";
 import { Message, messaging } from "shared/game/messaging";
-import { PlayerService } from "../players/player-service";
+import { GetRegisteredPlayer } from "../players/player-service";
 
 @Service()
 export class WeaponService implements OnStart {
-    constructor(private playerService: PlayerService) {};
-
     private weapons: Record<string, Record<string, Weapon>> = {};
 
     onStart() {
@@ -15,12 +13,12 @@ export class WeaponService implements OnStart {
             if (this.weapons[player.Name][data.weaponName]) return false;
 
             const weaponName = data.weaponName;
-            const playerClass = this.playerService.GetPlayer(player);
+            const playerClass = GetRegisteredPlayer(player);
             
             if (playerClass === undefined) return false;
             if (playerClass.inventory.weapons[weaponName] === undefined) return false;
 
-            const weaponClass = new Weapon(weaponName, player, this.playerService);
+            const weaponClass = new Weapon(weaponName, player);
 
             if (weaponClass === undefined) return false;
 
@@ -36,7 +34,7 @@ export class WeaponService implements OnStart {
 
             const weapon = this.weapons[player.Name][data.weaponName];
 
-            const playerClass = this.playerService.GetPlayer(player);
+            const playerClass = GetRegisteredPlayer(player);
             if (!playerClass) return false;
             if (playerClass.GetEquippedWeapon() === data.weaponName) return false;
 
@@ -46,7 +44,7 @@ export class WeaponService implements OnStart {
         messaging.server.on(Message.fireWeapon, (player, data) => {
             if (!this.weapons[player.Name]) return false;
             
-            const playerClass = this.playerService.GetPlayer(player);
+            const playerClass = GetRegisteredPlayer(player);
             if (!playerClass) return false;
             if (playerClass.GetEquippedWeapon() === undefined) return false;
 

@@ -6,12 +6,14 @@ import { NewPlayer } from "server/game/players/player-class";
 import { gameState } from "server/game/state/game-state";
 import { Message, messaging } from "shared/game/messaging";
 import { HeistController } from "../heists/heists";
+import { Interaction } from "../interactions/interactions";
 
 import CharmSync from "@rbxts/charm-sync";
 // TODO: make this 1 module
 import atoms from "shared/game/data/player-atoms";
 
-let playerSyncers = new Map<Player, ServerSyncer<{}, true>>();
+const playerSyncers = new Map<Player, ServerSyncer<{}, true>>();
+const playerStates = new Map<Player, typeof atoms>();
 
 function SetupSyncerForState(player: Player, state: typeof atoms) {
     const syncer = CharmSync.server({
@@ -24,12 +26,21 @@ function SetupSyncerForState(player: Player, state: typeof atoms) {
 }
 
 const ConstructNewPlayerState = () => ({
-    test: atom(0)
+    masked: atom(false)
 }) satisfies typeof atoms;
+
+export function GetPlayerState(player: Player) {
+    return playerStates.get(player);
+}
+
+const registeredPlayers: { [key: string]: NewPlayer } = {};
+
+export function GetRegisteredPlayer(player: Player) {
+    return registeredPlayers[player.Name];
+}
 
 @Service()
 export class PlayerService implements OnStart {
-    registeredPlayers: { [key: string]: NewPlayer } = {};
 
     constructor(private heistController: HeistController) {}
 
@@ -40,9 +51,8 @@ export class PlayerService implements OnStart {
         });
 
         gameSyncer.connect((_, payload) => {
-            for (const [player] of playerSyncers) {
+            for (const [player] of playerSyncers) 
                 messaging.client.emit(player, Message.gameSessionSync, payload);
-            }
         });
 
         messaging.server.on(Message.requestSessionState, player => {
@@ -61,6 +71,9 @@ export class PlayerService implements OnStart {
         });
 
         Players.PlayerAdded.Connect((player) => {
+            // create mask interaction
+            new Interaction("Mask", undefined, `Mask_Equip_${player.Name}`);
+
             // character initialization
             player.CharacterAdded.Connect((character) => {
                 for (const [key, value] of pairs(StarterPlayer.WaitForChild("StarterCharacterScripts").GetChildren())) 
@@ -75,9 +88,10 @@ export class PlayerService implements OnStart {
 
             // player & game state
             const playerState = ConstructNewPlayerState();
+            playerStates.set(player, playerState);
 
             const playerClass = new NewPlayer(player, playerState);
-            this.registeredPlayers[player.Name] = playerClass;
+            registeredPlayers[player.Name] = playerClass;
 
             playerClass.LoadCharacter(ReplicatedStorage.Assets.Characters.Default, this.heistController.map?.WaitForChild("SpawnLocation") as SpawnLocation);
 
@@ -87,11 +101,7 @@ export class PlayerService implements OnStart {
         })
         
         Players.PlayerRemoving.Connect((player) => {
-            delete this.registeredPlayers[player.Name];
+            delete registeredPlayers[player.Name];
         })
-    }
-
-    GetPlayer(player: Player) {
-        return this.registeredPlayers[player.Name];
     }
 }

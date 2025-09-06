@@ -1,48 +1,53 @@
-import { OnStart } from "@flamework/core";
-import { Component, BaseComponent } from "@flamework/components";
+import Signal from "@rbxts/signal";
 import { UITil } from "client/game/modules/ui-til";
-import { messaging, Message } from "shared/game/messaging";
+import { SoundRegistry } from "client/universal/dependencies/sound";
+import { Message, messaging } from "shared/game/messaging";
+import { PlayerController } from "../player/player-controller";
+import { ViewmodelController } from "../player/viewmodel-controller";
 
-import interactions from "shared/game/data/interactions";
+import interactionsShared from "shared/game/data/interactions";
+import interactionsClient from "./interactions-data";
 
-let activeInteraction = undefined as Interactable | undefined;
+export class Interactable {
+    readonly data;
+    readonly clientData;
 
-@Component({
-    tag: "Interactable"
-})
-export class Interactable extends BaseComponent<{ Type: string }> implements OnStart {
-    private data;
-    
-    constructor() {
-        super();
+    onInteractionEnded = new Signal();
 
-        this.data = interactions[this.attributes.Type as keyof typeof interactions];
-    }
+    private destroyed = false;
 
-    public getText() {
-        const HoP = this.data.Type === "Wait" ? "Hold" : "Press";
-        return `${HoP} [F] ${this.data.Text(this.instance)}`; 
+    private callback?;
+
+    constructor(attributeType: keyof typeof interactionsShared, private id: string, private playerController: PlayerController, public viewmodelController: ViewmodelController) {
+        this.data = interactionsShared[attributeType];
+
+        this.clientData = interactionsClient[attributeType];
+        if ("Callback" in this.clientData)
+            this.callback = this.clientData.Callback;
     }
 
     public onInteract() {
-        if (!messaging.server.invoke(Message.startInteraction, Message.startInteractionReturn, { interaction: this.instance })) return;
+        if (this.destroyed) return;
+        if (!messaging.server.invoke(Message.startInteraction, Message.startInteractionReturn, { interaction: this.id }).await()[1]) return;
 
         if (this.data.Type === "Instant") {
-            //this.data.Callback?.(this);
+            this.callback?.(this, undefined);
+            this.onInteractionEnded.Fire();
+
+            if ("Sound" in this.data)
+                SoundRegistry.play(this.data.Sound);
             return;
         }
 
-        activeInteraction = this;
+        this.playerController.state.currentInteraction = this;
 
         const waitTime = this.data.Type === "Wait" && "WaitTime" in this.data ? this.data.WaitTime : 1;
-
-        //const callback = this.data.Callback;
         const startTime = tick();
 
-        //callback?.(this, "Start"); 
+        this.callback?.(this, "Start");
 
         while (!(tick() - startTime >= waitTime)) {
-            if (activeInteraction !== this) {
+            if (this.playerController.state.currentInteraction !== this || this.destroyed) {
                 UITil.UpdateInteractionProgressBar(-1);
                 return;
             }
@@ -52,21 +57,26 @@ export class Interactable extends BaseComponent<{ Type: string }> implements OnS
         }
 
         UITil.UpdateInteractionProgressBar(-1);
-        activeInteraction = undefined;
+        this.playerController.state.currentInteraction = undefined;
 
-        //callback?.(this, "End");
+        this.callback?.(this, "End");
+        this.onInteractionEnded.Fire();
+
+        if ("Sound" in this.data)
+            SoundRegistry.play(this.data.Sound);
     }
 
     public cancelInteraction() {
-        if (activeInteraction !== this) return;
+        if (this.playerController.state.currentInteraction !== this || this.destroyed) return;
 
         messaging.server.emit(Message.cancelInteraction);
-        activeInteraction = undefined;
+        this.playerController.state.currentInteraction = undefined;
     }
 
     public destroy() {
-        super.destroy();
-    }
+        this.destroyed = true;
 
-    onStart() {}
+        if (this.playerController.state.currentInteraction === this) 
+            this.playerController.state.currentInteraction = undefined;
+    }
 }

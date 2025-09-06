@@ -1,18 +1,11 @@
-import { Interactions } from "server/game/interactions/interactions";
 import atoms from "shared/game/data/player-atoms";
-
-export function GetClassFromPlayer(player: Player) {
-    return playerClasses.get(player);
-}
-
-const playerClasses = new Map<Player, NewPlayer>();
 
 export class NewPlayer {
     readonly player;
 
     public state = {
         equippedWeapon: undefined as string | undefined,
-        activeInteraction: undefined as Interactions | undefined,
+        activeInteraction: undefined as string | undefined,
     };
 
     public weaponState = {
@@ -32,8 +25,6 @@ export class NewPlayer {
             M4A1: true,
             M1911: true
         };
-
-        playerClasses.set(playerItem, this);
     }
 
     EquipWeapon(weapon: string) {

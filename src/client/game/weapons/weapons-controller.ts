@@ -124,8 +124,13 @@ export class WeaponController implements OnStart, OnRender {
         this.InitializeInputs();
         this.inputController.Init();
 
-        /*
         this.weapons["M4A1"] = new Weapon("M4A1", this.playerController, this.viewmodelController) as Weapon;
+
+        this.playerController.onMask.Connect(() => {
+            this.EquipWeapon(this.weapons["M4A1"]);
+        })
+
+        /*
         this.EquipWeapon(this.weapons["M4A1"]);*/
         
         Iris.Init();
@@ -140,7 +145,10 @@ export class WeaponController implements OnStart, OnRender {
     }
 
     onRender(dt: number) {
-        if (!this.currentWeapon) return;
+        if (!this.currentWeapon) {
+            this.viewmodelController.setViewmodelCFrame(Workspace.CurrentCamera!.CFrame);
+            return;
+        }
 
         const offset = this.currentWeapon.GetOffset(dt) as CFrame;
 

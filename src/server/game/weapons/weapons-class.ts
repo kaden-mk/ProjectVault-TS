@@ -1,4 +1,4 @@
-import { PlayerService } from "server/game/players/player-service";
+import { GetPlayerState, GetRegisteredPlayer } from "server/game/players/player-service";
 import { Object } from "shared/game/dependencies/object-util";
 
 import weapons from "shared/game/data/weapons";
@@ -23,8 +23,8 @@ export class Weapon {
     };
     private cooldown;
 
-    constructor(readonly weaponName: keyof typeof weapons, owner: Player, private playerService: PlayerService) {
-        this.owner = playerService.GetPlayer(owner);
+    constructor(readonly weaponName: keyof typeof weapons, owner: Player) {
+        this.owner = GetRegisteredPlayer(owner);
         this.name = weaponName;
         this.data = weapons[weaponName];
         this.cooldown = 1 / (this.data.RPM / 60);
@@ -69,6 +69,9 @@ export class Weapon {
     Equip() {
         if (this.owner.weaponState.canDoAnything === false) return false;
         if (this.owner.GetEquippedWeapon() !== undefined) return false;
+
+        const playerState = GetPlayerState(this.owner.player);
+        if (playerState?.masked() === false) return false;
 
         this.model.Parent = this.owner.player.Character;
         Object.SetPhysics(this.model, false, false);

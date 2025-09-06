@@ -7,6 +7,7 @@ interface GameGui extends ScreenGui {
     TopLeft: Frame & {
         TextLabel: TextLabel
     },
+    BlackScreen: Frame,
     Crosshair: ImageLabel
 }
 

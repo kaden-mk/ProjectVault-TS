@@ -1,28 +1,33 @@
-import { Components } from "@flamework/components";
-import { Dependency, OnStart, Service } from "@flamework/core";
-import { Interactions } from "server/game/interactions/interactions";
-import { GetClassFromPlayer } from "server/game/players/player-class";
+import { OnStart, Service } from "@flamework/core";
+import { GetRegisteredPlayer } from "server/game/players/player-service";
 import { Message, messaging } from "shared/game/messaging";
+import { GetInteractionFromId } from "./interactions";
 
 @Service()
 export class InteractionsService implements OnStart {
-    onStart() {
-        const components = Dependency<Components>();
+    constructor() {};
 
-        messaging.server.setCallback(Message.startInteraction, Message.startInteractionReturn, (player, interaction) => {
-            const component = components.getComponent<Interactions>(interaction.interaction);
+    onStart() {
+        messaging.server.setCallback(Message.canCreateInteraction, Message.canCreateInteractionReturn, (player, data) => {
+            return GetInteractionFromId(data.id) !== undefined;
+        });
+
+        messaging.server.setCallback(Message.startInteraction, Message.startInteractionReturn, (player, data) => {
+            const component = GetInteractionFromId(data.interaction);
             if (component === undefined) return false;
 
             return component.onInteract(player);
-        })
+        });
 
         messaging.server.on(Message.cancelInteraction, (player) => {
-            const playerData = GetClassFromPlayer(player);
+            const playerData = GetRegisteredPlayer(player);
 
-            const component = playerData?.state.activeInteraction;
+            if (!playerData || !playerData.state.activeInteraction) return;
+
+            const component = GetInteractionFromId(playerData.state.activeInteraction);
             if (component === undefined) return;
 
             component.cancelInteraction(player);
-        })
+        });
     }
 }

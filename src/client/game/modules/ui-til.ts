@@ -3,8 +3,6 @@ import { Players, RunService, TweenService } from "@rbxts/services";
 
 const player = Players.LocalPlayer;
 
-//StarterGui.WaitForChild("MainGui").Clone().Parent = Players.LocalPlayer.WaitForChild("PlayerGui");
-
 export namespace UITil {
     const playerGui = player.WaitForChild("PlayerGui") as PlayerGui;
     const mainGui = playerGui.WaitForChild("MainGui") as GameGui;
@@ -70,17 +68,20 @@ export namespace UITil {
         });
     }
 
-    export function Fade(frame: Frame, ior: "out" | "in") {
-        TweenService.Create(frame, new TweenInfo(1), {
-            BackgroundTransparency: 1
+    export function Fade(ior: "out" | "in", frame?: Frame, duration?: number)  {
+        frame = frame ? frame : mainGui.BlackScreen;
+
+        const tweenInfo = new TweenInfo(duration ? duration : 1);
+        const transparency = ior === "out" ? 1 : 0
+        
+        TweenService.Create(frame, tweenInfo, {
+            BackgroundTransparency: transparency
         }).Play()
 
         const items = [ "TextButton", "Frame", "TextLabel" ]
 
         for (const [_, item] of pairs(frame.GetChildren())) {
             if (!items.includes(item.ClassName)) continue;
-
-            const transparency = ior === "out" ? 1 : 0
 
             type tweenData = {
                 BackgroundTransparency: number
@@ -94,7 +95,7 @@ export namespace UITil {
             if (item.ClassName === "TextButton" || item.ClassName === "TextLabel")
                 data.TextTransparency = transparency
 
-            TweenService.Create(item, new TweenInfo(1), data as never).Play()
+            TweenService.Create(item, tweenInfo, data as never).Play()
         }
     }
 } 

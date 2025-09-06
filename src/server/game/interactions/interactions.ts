@@ -1,103 +1,112 @@
-import { BaseComponent, Component } from "@flamework/components";
-import { GetClassFromPlayer } from "server/game/players/player-class";
+import { HttpService } from "@rbxts/services";
+import { GetPlayerState, GetRegisteredPlayer } from "../players/player-service";
 
 import interactionsServer from "server/game/interactions/interactions-data";
-import interactions from "shared/game/data/interactions";
+import interactionsShared from "shared/game/data/interactions";
 
-@Component({
-    tag: "Interactable"
-})
-export class Interactions extends BaseComponent<{ Type: string }> {    
+const interactions: { [id: string]: Interaction } = {};
+
+export function GetInteractionFromId(id: string) {
+    return interactions[id];
+}
+
+export function GetPlayerStateInteraction(player: Player) {
+    return GetPlayerState(player);
+}   
+
+export class Interaction {
     private data;
+    private readonly id;
+    
+    instance?: Instance;
     private callback;
 
-    constructor() {
-        super();
+    constructor(interactionType: keyof typeof interactionsShared, instance?: Instance, id?: string) {
+        if (id) this.id = id; else this.id = HttpService.GenerateGUID(false);
 
-        this.data = interactions[this.attributes.Type as keyof typeof interactions];
+        this.instance = instance
+        if (instance) instance.SetAttribute("Id", this.id);
 
-        const interactionServerData = interactionsServer[this.attributes.Type as keyof typeof interactionsServer];
+        interactions[this.id] = this;
+        
+        this.data = interactionsShared[interactionType];
+
+        const interactionServerData = interactionsServer[interactionType as keyof typeof interactionsServer];
         this.callback = interactionServerData.callback;
 
-        (interactionServerData as any).onInit?.(this)
+        (interactionServerData as any).onInit?.(this);
     }
 
     private getPosition() {
-        const instance = this.instance as Model | BasePart; // i should definitely improve this
-
-        return instance.GetPivot().Position;
+        const modelOrPart = this.instance as Model | BasePart;
+        return modelOrPart.GetPivot().Position;
     }
 
     private isPlayerNearby(player: Player) {
-        const character = player.Character;
-        if (character === undefined || character.Parent === undefined) return false;
-        // check to see if its interactable here
+        if (!this.instance) return true;
 
-        return (character.GetPivot().Position.sub(this.getPosition())).Magnitude <= 8;
+        const character = player.Character;
+        if (!character || !character.Parent) return false;
+
+        return character.GetPivot().Position.sub(this.getPosition()).Magnitude <= 8;
     }
 
     public onInteract(player: Player) {
         if (!this.isPlayerNearby(player)) return false;
 
-        const playerData = GetClassFromPlayer(player);
+        const playerData = GetRegisteredPlayer(player);
 
-        if (playerData === undefined) return false;
-        if (playerData.state.activeInteraction !== undefined) return false;
+        if (!playerData) return false;
+        if (playerData.state.activeInteraction) return false;
 
         if (this.data.Type === "Instant") {
-            this.callback?.(this as any, undefined);
+            this.callback?.(this as any, undefined, player);
             return false;
         }
 
-        if (this.callback !== undefined) {
-            const canStart = this.callback(this as any, "Start");
-            if (canStart === false) return false;
-        }
+        if (this.callback && this.callback(this as any, "Start", player) === false) return false;
 
-        playerData.state.activeInteraction = this;
+        playerData.state.activeInteraction = this.id;
 
         const startTime = tick();
         const waitTime = this.data.Type === "Wait" && "WaitTime" in this.data ? this.data.WaitTime : 1;
-        
-        task.spawn(() => {
-            let go = true;
 
-            while (!(tick() - startTime >= waitTime)) {
-                if (playerData.state.activeInteraction !== this) {
+        task.spawn(() => {
+            let go = true
+
+            while (tick() - startTime < waitTime) {
+                if (playerData.state.activeInteraction !== this.id) {
                     go = false;
                     break;
                 }
-
-                // TODO: Make this a remote event
                 if (!this.isPlayerNearby(player)) {
                     playerData.state.activeInteraction = undefined;
                     go = false;
                     break;
                 }
-
                 task.wait();
             }
 
             if (!go) return;
 
             playerData.state.activeInteraction = undefined;
-
-            this.callback?.(this as any, "End");
-        })
+            this.callback?.(this as any, "End", player);
+        });
 
         return true;
     }
 
     public cancelInteraction(player: Player) {
-        const playerData = GetClassFromPlayer(player);
+        const playerData = GetRegisteredPlayer(player);
 
         if (playerData === undefined) return;
-        if (playerData.state.activeInteraction !== this) return;
+        if (playerData.state.activeInteraction !== this.id) return;
 
         playerData.state.activeInteraction = undefined;
     }
 
     public destroy() {
-        this.instance.Destroy();
+        this.instance?.Destroy();
+        delete interactions[this.id];
     }
 }

@@ -29,7 +29,7 @@ export class Interface implements OnStart {
 
             if (playersReady >= Players.GetPlayers().size()) {
                 this.state.ready = false;
-                UITil.Fade(startingFrame, "out");
+                UITil.Fade("out", startingFrame);
                 this.playerController.player.CameraMode = Enum.CameraMode.LockFirstPerson;
                 UserInputService.MouseIconEnabled = false;
             }

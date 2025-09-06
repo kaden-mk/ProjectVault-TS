@@ -1,8 +1,8 @@
-import { Element, BaseElement } from "client/lobby/elements/core"
-import { ElementButton } from "client/lobby/elements/button"
-import { Workspace, RunService } from "@rbxts/services"
+import { RunService, Workspace } from "@rbxts/services";
+import { ElementButton } from "client/lobby/elements/button";
+import { BaseElement, Element } from "client/lobby/elements/core";
 
-import { open as openHeists } from "./heists-interface"
+import { open as openHeists } from "./heists-interface";
 
 @Element()
 export class UIHandler extends BaseElement {

@@ -1,5 +1,5 @@
 import { atom } from "@rbxts/charm";
 
 export default {
-    test: atom(0),
+    masked: atom(false),
 }

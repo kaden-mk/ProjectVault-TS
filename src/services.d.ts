@@ -19,6 +19,13 @@ interface ReplicatedStorage {
 
         Characters: Folder & {
             [key: string]: Model
+        },
+
+        Masks: Folder & {
+            [key: string]: Folder & {
+                Part: BasePart,
+                Animation: Animation
+            }
         }
     }
 }

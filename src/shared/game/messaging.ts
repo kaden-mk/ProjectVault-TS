@@ -24,6 +24,8 @@ export const enum Message {
   gameSessionSync,
   startInteraction,
   startInteractionReturn,
+  canCreateInteraction,
+  canCreateInteractionReturn,
   cancelInteraction,
   playerReadyUp
 }
@@ -42,9 +44,11 @@ export interface MessageData {
   [Message.gameSessionSync]: SyncPayload<typeof gameAtoms>
 
   /* interactions */
-  [Message.startInteraction]: { readonly interaction: Instance };
+  [Message.startInteraction]: { readonly interaction: string };
   [Message.startInteractionReturn]: boolean;
   [Message.cancelInteraction]: undefined;
+  [Message.canCreateInteraction]: { readonly id: string };
+  [Message.canCreateInteractionReturn]: boolean;
 
   /* player */
   [Message.playerReadyUp]: undefined;

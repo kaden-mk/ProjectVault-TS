@@ -16,6 +16,7 @@ export class PlayerController implements OnStart {
     public replicatedGameState = table.clone(gameAtoms);
 
     public gameStateUpdated = new Signal();
+    public onMask = new Signal();
 
     private syncer = CharmSync.client({
         atoms: this.replicatedPlayerState
@@ -25,16 +26,23 @@ export class PlayerController implements OnStart {
         atoms: this.replicatedGameState
     });
 
-    private state : { [key: string]: string | undefined } = {
-        equippedWeapon: undefined
+    state: { equippedWeapon: string | undefined, currentInteraction: unknown | undefined, masked: boolean } = {
+        equippedWeapon: undefined,
+        currentInteraction: undefined,
+        masked: false
     }
 
     onStart() {
         messaging.client.on(Message.playerSessionSync, payload => {
             this.syncer.sync(payload);
+
+            // to improve?
+            if (payload.data.masked) {
+                this.state.masked = payload.data.masked;
+                this.onMask.Fire();
+            }
         });
 
-        // TODO: add a signal to this
         messaging.client.on(Message.gameSessionSync, payload => {
             this.gameSyncer.sync(payload);
             this.gameStateUpdated.Fire();

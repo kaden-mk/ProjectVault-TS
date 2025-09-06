@@ -3,7 +3,10 @@ import { Controller, Dependency, OnRender, OnStart } from "@flamework/core";
 import { CollectionService, Players, Workspace } from "@rbxts/services";
 import { Input } from "client/game/input/input-class";
 import { UITil } from "client/game/modules/ui-til";
+import { PlayerController } from "../player/player-controller";
+import { ViewmodelController } from "../player/viewmodel-controller";
 import { Interactable } from "./interactions";
+import { InteractionsComponents } from "./interactions-components";
 
 // TODO: optimize?
 function FindTagged(instance: Instance, tag: string) {
@@ -15,7 +18,7 @@ function FindTagged(instance: Instance, tag: string) {
     return undefined;
 }
 
-function GetInteractableFromRay(): Interactable | undefined {
+function GetInteractableFromRay(): InteractionsComponents | undefined {
     if (Players.LocalPlayer.Character?.Parent === undefined) return undefined;
 
     const RaycastParameters = new RaycastParams();
@@ -29,7 +32,7 @@ function GetInteractableFromRay(): Interactable | undefined {
     if (ray && ray.Instance.IsA("BasePart")) {
         const tagged = FindTagged(ray.Instance, "Interactable");
         if (tagged) {
-            const component = components.getComponent<Interactable>(tagged);
+            const component = components.getComponent<InteractionsComponents>(tagged);
             return component;
         }
     }
@@ -39,9 +42,9 @@ function GetInteractableFromRay(): Interactable | undefined {
 export class InteractionsController implements OnStart, OnRender {
     private inputController: Input;
     private highlight: Highlight;
-    private currentInteractable: Interactable | undefined = undefined;
+    private currentInteractable: InteractionsComponents | undefined = undefined;
 
-    constructor() {
+    constructor(private playerController: PlayerController, private viewmodelController: ViewmodelController) {
         this.inputController = new Input();
         this.highlight = new Instance("Highlight");
     }
@@ -62,6 +65,20 @@ export class InteractionsController implements OnStart, OnRender {
                 this.currentInteractable.cancelInteraction();
             else
                 this.currentInteractable.onInteract();
+        });
+
+        // masking
+        const maskInteraction = new Interactable("Mask", `Mask_Equip_${this.playerController.player.Name}`, this.playerController, this.viewmodelController);
+
+        maskInteraction.onInteractionEnded.Connect(() => {
+            this.inputController.Unbind("Mask");
+        });
+
+        this.inputController.Bind("Mask", Enum.KeyCode.G, true, (input, ended) => {
+            if (ended)
+                maskInteraction.cancelInteraction();
+            else
+                maskInteraction.onInteract();
         });
     }
 
