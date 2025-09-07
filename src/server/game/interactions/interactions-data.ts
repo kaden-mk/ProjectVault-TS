@@ -1,4 +1,5 @@
 import { Interaction } from "server/game/interactions/interactions";
+import { Loot } from "shared/game/data/loot";
 import { NewPlayer } from "../players/player-class";
 
 import { gameState } from "../state/game-state";
@@ -14,12 +15,14 @@ export default {
     "Instant-Loot": {
         callback: (object: Interaction, interactionType: string | undefined) => {
             object.destroy();
-            gameState.take(gameState.take() + 1000);
+            gameState.take(gameState.take() + Loot.value(object.instance?.GetAttribute("Loot") as keyof typeof Loot.value));
         }
     },
     "Loot": {
-        callback: (object: Interaction, interactionType: string | undefined) => {
-            if (interactionType === "End")
+        callback: (object: Interaction, interactionType: string | undefined, player: NewPlayer) => {
+            if (interactionType === "Start" && player.atomState.bagged() !== "undefined") return false;
+
+            if (interactionType === "End" && player.Bag(object.instance?.GetAttribute("Loot") as string))
                 object.destroy();
 
             return true;

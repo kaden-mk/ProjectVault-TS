@@ -1,5 +1,6 @@
 import { FormatStandard } from "@rbxts/format-number";
 import { Players, RunService, TweenService } from "@rbxts/services";
+import { Loot } from "shared/game/data/loot";
 
 const player = Players.LocalPlayer;
 
@@ -49,34 +50,54 @@ export namespace UITil {
     }
 
     let currentTake = 0;
+    let displayedTake = 0;
+    let takeIndex = 0;
 
     export function UpdateTake(take: number) {
-        const start = currentTake;
+        const start = displayedTake;
         const last = take;
         const duration = 1;
         const steps = 30;
         const stepTime = duration / steps;
+        const id = ++takeIndex;
 
-        task.spawn(() => {            
+        task.spawn(() => {
             for (let step = 1; step <= steps; step++) {
+                if (id !== takeIndex) return;
+
                 const progress = step / steps;
                 const value = math.floor(start + (last - start) * progress);
+                displayedTake = value;
                 topLeft.TextLabel.Text = `Take: $${FormatStandard(value)}`;
                 task.wait(stepTime);
             }
-            currentTake = last;
+
+            if (id === takeIndex) {
+                currentTake = last;
+                displayedTake = last;
+            }
         });
+    }
+
+    export function UpdateHoldingText(holding: keyof typeof Loot.value) {
+        const value = Loot.value(holding);
+        if (!value) {
+            topLeft.HoldingText.Text = `Holding:`;
+            return;
+        };
+
+        topLeft.HoldingText.Text = `Holding: ${holding} ($${FormatStandard(value)})`;
     }
 
     export function Fade(ior: "out" | "in", frame?: Frame, duration?: number)  {
         frame = frame ? frame : mainGui.BlackScreen;
 
         const tweenInfo = new TweenInfo(duration ? duration : 1);
-        const transparency = ior === "out" ? 1 : 0
+        const transparency = ior === "out" ? 1 : 0;
         
         TweenService.Create(frame, tweenInfo, {
             BackgroundTransparency: transparency
-        }).Play()
+        }).Play();
 
         const items = [ "TextButton", "Frame", "TextLabel" ]
 
@@ -93,9 +114,9 @@ export namespace UITil {
             }
 
             if (item.ClassName === "TextButton" || item.ClassName === "TextLabel")
-                data.TextTransparency = transparency
+                data.TextTransparency = transparency;
 
-            TweenService.Create(item, tweenInfo, data as never).Play()
+            TweenService.Create(item, tweenInfo, data as never).Play();
         }
     }
 } 

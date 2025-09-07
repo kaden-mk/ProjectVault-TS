@@ -43,6 +43,7 @@ export class Interaction {
 
         const character = player.Character;
         if (!character || !character.Parent) return false;
+        if (this.instance.GetAttribute("CanInteract") === false) return false;
 
         return character.GetPivot().Position.sub(this.getPosition()).Magnitude <= 8;
     }

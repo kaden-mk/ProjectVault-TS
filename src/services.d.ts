@@ -26,6 +26,10 @@ interface ReplicatedStorage {
                 Part: BasePart,
                 Animation: Animation
             }
+        },
+
+        Bags: Folder & {
+            [key: string]: BasePart
         }
     }
 }

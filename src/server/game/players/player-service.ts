@@ -2,7 +2,7 @@ import { OnStart, Service } from "@flamework/core";
 import { atom } from "@rbxts/charm";
 import { ServerSyncer } from "@rbxts/charm-sync";
 import { Players, ReplicatedStorage, StarterPlayer } from "@rbxts/services";
-import { NewPlayer, RemovePlayer } from "server/game/players/player-class";
+import { GetPlayer, NewPlayer, RemovePlayer } from "server/game/players/player-class";
 import { gameState } from "server/game/state/game-state";
 import { Message, messaging } from "shared/game/messaging";
 import { HeistController } from "../heists/heists";
@@ -25,7 +25,8 @@ function SetupSyncerForState(player: Player, state: typeof atoms) {
 }
 
 const ConstructNewPlayerState = () => ({
-    masked: atom(false)
+    masked: atom(false),
+    bagged: atom("undefined")
 }) satisfies typeof atoms;
 
 @Service()
@@ -45,7 +46,13 @@ export class PlayerService implements OnStart {
 
         messaging.server.on(Message.requestSessionState, player => {
             playerSyncers.get(player)?.hydrate(player);
-        })
+        });
+
+        messaging.server.on(Message.throwBag, (player, data) => {
+            const playerData = GetPlayer(player);
+            if (!playerData) return;
+            playerData.ThrowBag(data.throwDirection);
+        });
 
         // TODO: check for the player if they already did this or something, just fgind a better way to do this
         let gameInitialized = false;

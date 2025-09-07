@@ -5,7 +5,8 @@ interface GameGui extends ScreenGui {
         Text: TextLabel
     },
     TopLeft: Frame & {
-        TextLabel: TextLabel
+        TextLabel: TextLabel,
+        HoldingText: TextLabel
     },
     BlackScreen: Frame,
     Crosshair: ImageLabel

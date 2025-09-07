@@ -170,6 +170,7 @@ export class Weapon {
         if (this.state.isEnabled === false) return;
         if (this.state.isEquipped === false) return;
         if (this.state.canFire === false) return;
+        if (this.playerController.state.running === true) return;
 
         const handle = this.model.FindFirstChild("Handle") as BasePart;
         const gunFirePoint = handle.FindFirstChild("GunFirePoint") as Attachment;

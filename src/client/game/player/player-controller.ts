@@ -1,6 +1,9 @@
 import { Controller, OnStart } from "@flamework/core";
-import { Players } from "@rbxts/services";
+import { Players, Workspace } from "@rbxts/services";
+import { Loot } from "shared/game/data/loot";
 import { Message, messaging } from "shared/game/messaging";
+import { Input } from "../input/input-class";
+import { UITil } from "../modules/ui-til";
 
 import CharmSync from "@rbxts/charm-sync";
 import Signal from "@rbxts/signal";
@@ -18,6 +21,12 @@ export class PlayerController implements OnStart {
     public gameStateUpdated = new Signal();
     public onMask = new Signal();
 
+    public state: { equippedWeapon: string | undefined, currentInteraction: unknown | undefined, running: boolean } = {
+        equippedWeapon: undefined,
+        currentInteraction: undefined,
+        running: false
+    }
+
     private syncer = CharmSync.client({
         atoms: this.replicatedPlayerState
     });
@@ -26,11 +35,15 @@ export class PlayerController implements OnStart {
         atoms: this.replicatedGameState
     });
 
-    state: { equippedWeapon: string | undefined, currentInteraction: unknown | undefined, masked: boolean, running: boolean } = {
-        equippedWeapon: undefined,
-        currentInteraction: undefined,
-        masked: false,
-        running: false
+    private inputController = new Input();
+
+    private input() {
+        this.inputController.Bind("ThrowBag", Enum.KeyCode.G, false, () => {
+            let throwDirection = Workspace.CurrentCamera!.CFrame.LookVector;
+            throwDirection = new Vector3(throwDirection.X, throwDirection.Y + 0.8, throwDirection.Z).Unit; 
+
+            messaging.server.emit(Message.throwBag, { throwDirection: throwDirection });
+        });
     }
 
     onStart() {
@@ -38,10 +51,11 @@ export class PlayerController implements OnStart {
             this.syncer.sync(payload);
 
             // to improve?
-            if (payload.data.masked) {
-                this.state.masked = payload.data.masked;
+            if (payload.data.masked)
                 this.onMask.Fire();
-            }
+
+            if (payload.data.bagged)
+                UITil.UpdateHoldingText(payload.data.bagged as keyof typeof Loot.value);
         });
 
         messaging.client.on(Message.gameSessionSync, payload => {
@@ -50,6 +64,9 @@ export class PlayerController implements OnStart {
         });
 
         messaging.server.emit(Message.requestSessionState);
+
+        this.input();
+        this.inputController.Init();
     }
 
     EquipWeapon(weaponName?: string) {

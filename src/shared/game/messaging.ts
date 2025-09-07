@@ -8,7 +8,6 @@ import weapons from "./data/weapons";
 
 export const messaging = MessageEmitter.create<MessageData>();
 
-// Maybe split??
 export const enum Message {
   createWeapon,
   createWeaponReturn,
@@ -27,7 +26,8 @@ export const enum Message {
   canCreateInteraction,
   canCreateInteractionReturn,
   cancelInteraction,
-  playerReadyUp
+  playerReadyUp,
+  throwBag
 }
 
 export interface MessageData {
@@ -52,4 +52,5 @@ export interface MessageData {
 
   /* player */
   [Message.playerReadyUp]: undefined;
+  [Message.throwBag]: { throwDirection: Vector3 };
 }

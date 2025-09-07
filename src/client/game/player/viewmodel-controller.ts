@@ -55,11 +55,12 @@ export class ViewmodelController {
 
         Object.Rig(this.model.WaitForChild("Right Arm") as BasePart, maskClone, maskClone.GetAttribute("C0") as CFrame);
 
-        task.delay(loadedAnimation.Length - 0.03, () => {
+        loadedAnimation.Ended.Connect(() => {
             UITil.Fade("in", undefined, 0.1);
-            task.wait(0.15);
+            task.wait(0.05);
             maskClone.Destroy();
-            UITil.Fade("out", undefined, 0.1);
+            task.wait(0.05);
+            UITil.Fade("out", undefined, 0.2);
         });
 
         loadedAnimation.Play();
