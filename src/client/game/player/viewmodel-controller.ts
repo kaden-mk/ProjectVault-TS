@@ -13,12 +13,12 @@ export class ViewmodelController {
     private fakeCamera: BasePart;
     private oldCameraCFrame = CFrame.identity; // for the fake camera
 
-    private bobbingSpring = new Spring(200, 20);
-    private swaySpring = new Spring(350, 45);
-    private runningSpring = new Spring(350, 45);
-    private runningSpringRot = new Spring(350, 45);
-    private movementSpring = new Spring(350, 45);
-    private strafeSpring = new Spring(350, 45);
+    bobbingSpring = new Spring(200, 20);
+    swaySpring = new Spring(350, 45);
+    runningSpring = new Spring(350, 45);
+    runningSpringRot = new Spring(350, 45);
+    movementSpring = new Spring(350, 45);
+    strafeSpring = new Spring(350, 45);
 
     constructor() {
         this.model = ReplicatedStorage.Assets.Viewmodels.Default.Clone();
@@ -63,67 +63,5 @@ export class ViewmodelController {
         });
 
         loadedAnimation.Play();
-    }
-
-    private getBobbing(addition: number, speed: number, modifier: number) {
-        return math.sin(tick() * addition * speed) * modifier;
-    }
-
-    getBobbingAndSwayOffsets(dt: number, running: boolean) {
-        const delta = game.GetService("UserInputService").GetMouseDelta();
-        this.swaySpring.Shove(new Vector3(-delta.X / 50, delta.Y / 50, 0));
-
-        const character = game.GetService("Players").LocalPlayer.Character;
-        const humanoidRootPart = character?.PrimaryPart;
-        if (!humanoidRootPart) return;
-
-        const modifier = 1;
-        const bobAmount = new Vector3(
-            this.getBobbing(5, 2, modifier),
-            this.getBobbing(10, 2, modifier),
-            0
-        );
-        this.bobbingSpring.Shove(bobAmount.div(10).mul(humanoidRootPart.AssemblyLinearVelocity.Magnitude / 10));
-
-        const swayOffset = this.swaySpring.Update(dt);
-        const swayCFrame = new CFrame(swayOffset.X, swayOffset.Y, 0).mul(CFrame.Angles(0, -swayOffset.X, swayOffset.Y));
-
-        const bobOffset = this.bobbingSpring.Update(dt);
-        const bobCFrame = new CFrame(bobOffset.X, bobOffset.Y, bobOffset.Z);
-
-        const targetPos = running ? new Vector3(-0.15, -0.2, 0.2) : new Vector3(0, 0, 0);
-        const targetRot = running ? new Vector3(0, math.rad(20), math.rad(25)) : new Vector3(0, 0, 0);
-
-        this.runningSpring.Shove(targetPos.sub(this.runningSpring.target));
-        this.runningSpring.target = targetPos;
-
-        this.runningSpringRot.Shove(targetRot.sub(this.runningSpringRot.target));
-        this.runningSpringRot.target = targetRot;
-
-        const runOffset = this.runningSpring.Update(dt);
-        const runRotOffset = this.runningSpringRot.Update(dt);
-        const runCFrame = new CFrame(runOffset.X, runOffset.Y, runOffset.Z).mul(CFrame.Angles(0, runRotOffset.Y, runRotOffset.Z));
-
-        const rootCFrame = humanoidRootPart.CFrame;
-        const velocity = humanoidRootPart.AssemblyLinearVelocity;
-        const localVelocity = rootCFrame.VectorToObjectSpace(velocity);
-
-        this.movementSpring.Shove(new Vector3(
-            -localVelocity.X / 50,
-            0,
-            -localVelocity.Z / 35
-        ));
-
-        const moveOffset = this.movementSpring.Update(dt);
-        const moveCFrame = new CFrame(moveOffset.X, moveOffset.Y, moveOffset.Z);
-
-        const strafeTilt = -localVelocity.X / 200;
-
-        this.strafeSpring.target = new Vector3(0, 0, strafeTilt);
-
-        const moveRotOffset = this.strafeSpring.Update(dt);
-        const moveRotCFrame = CFrame.Angles(0, 0, moveRotOffset.Z);
-
-        return swayCFrame.mul(bobCFrame).mul(runCFrame).mul(moveCFrame).mul(moveRotCFrame);
     }
 }

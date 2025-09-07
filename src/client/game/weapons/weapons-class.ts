@@ -143,6 +143,8 @@ export class Weapon {
         this.recoil.SwitchProfile(profile);
     }
 
+    IsAiming() { return this.state.isAiming; }
+
     Unequip() {
         if (this.state.isEquipped === false) return;
 
