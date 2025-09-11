@@ -1,4 +1,5 @@
 import atoms from "shared/game/data/player-atoms";
+import storage from "../modules/storage";
 
 import { ReplicatedStorage } from "@rbxts/services";
 import { Object } from "shared/game/dependencies/object-util";
@@ -102,7 +103,7 @@ export class NewPlayer {
         bag.Name = "Bag";
         bag.SetAttribute("Loot", this.atomState.bagged());
         bag.SetAttribute("Type", "Loot");
-        bag.Parent = game.Workspace;
+        bag.Parent = storage.Bags;
 
         bag.AddTag("Interactable");
         this.atomState.bagged("undefined");

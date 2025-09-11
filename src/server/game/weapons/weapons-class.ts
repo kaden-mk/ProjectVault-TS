@@ -1,5 +1,6 @@
 import { GetPlayer, NewPlayer } from "server/game/players/player-class";
 import { Object } from "shared/game/dependencies/object-util";
+import { gameState } from "../state/game-state";
 
 import weapons from "shared/game/data/weapons";
 
@@ -69,8 +70,8 @@ export class Weapon {
     Equip() {
         if (this.owner.weaponState.canDoAnything === false) return false;
         if (this.owner.GetEquippedWeapon() !== undefined) return false;
-
         if (this.owner.atomState.masked() === false) return false;
+        if (gameState.ended() === true) return false;
 
         this.model.Parent = this.owner.player.Character;
         Object.SetPhysics(this.model, false, false);
@@ -97,6 +98,7 @@ export class Weapon {
         if (this.state.isEnabled === false) return false;
         if (this.state.isFiring === true) return false;
         if (this.state.isReloading === true) return false; // TODO: add cancel reloading
+        if (gameState.ended() === true) return false;
 
         this.state.isFiring = true;
         task.delay(this.cooldown, () => {

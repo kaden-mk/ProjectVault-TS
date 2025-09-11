@@ -61,8 +61,10 @@ export class PlayerService implements OnStart {
 
             gameState.playersReady(gameState.playersReady() + 1);
 
-            if (gameState.playersReady() >= Players.GetPlayers().size()) 
+            if (gameState.playersReady() >= Players.GetPlayers().size()) {
                 gameInitialized = true;   
+                this.heistController.start();
+            }
         });
 
         Players.PlayerAdded.Connect((player) => {

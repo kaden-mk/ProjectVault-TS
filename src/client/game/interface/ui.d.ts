@@ -6,7 +6,8 @@ interface GameGui extends ScreenGui {
     },
     TopLeft: Frame & {
         TextLabel: TextLabel,
-        HoldingText: TextLabel
+        HoldingText: TextLabel,
+        ObjectiveText: TextLabel
     },
     BlackScreen: Frame,
     Crosshair: ImageLabel
@@ -17,4 +18,11 @@ interface StartingGui extends ScreenGui {
         TextButton: TextButton,
         TextLabel: TextLabel
     }
+}
+
+interface EndGui extends ScreenGui {
+    BlackScreen: Frame & {
+        TakeLabel: TextLabel,
+        TextLabel: TextLabel
+    },
 }

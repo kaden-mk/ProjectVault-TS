@@ -80,6 +80,11 @@ export class WeaponController implements OnStart, OnRender {
         if (this.playerController.state.running && ended === false)
             this.Run(true);
 
+        const humanoid = this.playerController.player.Character?.FindFirstChildOfClass("Humanoid");
+
+        if (humanoid) 
+            humanoid.WalkSpeed = ended ? 16 : 10;
+
         this.currentWeapon?.Aim(!ended);
         UITil.Crosshair(ended);
 

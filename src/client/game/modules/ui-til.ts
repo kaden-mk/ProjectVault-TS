@@ -1,12 +1,14 @@
 import { FormatStandard } from "@rbxts/format-number";
 import { Players, RunService, TweenService } from "@rbxts/services";
-import { Loot } from "shared/game/data/loot";
+import { SoundRegistry } from "client/universal/dependencies/sound";
+import { Loot, LootValue } from "shared/game/data/loot";
 
 const player = Players.LocalPlayer;
 
 export namespace UITil {
     const playerGui = player.WaitForChild("PlayerGui") as PlayerGui;
     const mainGui = playerGui.WaitForChild("MainGui") as GameGui;
+    const endGui = playerGui.WaitForChild("EndGui") as EndGui;
 
     const interactionFrame = mainGui.Interact;
     const interactionLabel = interactionFrame.Text;
@@ -79,7 +81,7 @@ export namespace UITil {
         });
     }
 
-    export function UpdateHoldingText(holding: keyof typeof Loot.value) {
+    export function UpdateHoldingText(holding: LootValue) {
         const value = Loot.value(holding);
         if (!value) {
             topLeft.HoldingText.Text = `Holding:`;
@@ -118,5 +120,15 @@ export namespace UITil {
 
             TweenService.Create(item, tweenInfo, data as never).Play();
         }
+    }
+
+    export function UpdateObjectiveText(text: string) {
+        SoundRegistry.play("Objective");
+        topLeft.ObjectiveText.Text = `Objective: ${text}`;
+    }
+
+    export function OnEnd() {
+        endGui.BlackScreen.TakeLabel.Text = `$${FormatStandard(currentTake)}`;
+        Fade("in", endGui.BlackScreen, 1);
     }
 } 

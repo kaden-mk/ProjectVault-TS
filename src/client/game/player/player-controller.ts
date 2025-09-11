@@ -1,6 +1,6 @@
 import { Controller, OnStart } from "@flamework/core";
 import { Players, Workspace } from "@rbxts/services";
-import { Loot } from "shared/game/data/loot";
+import { LootValue } from "shared/game/data/loot";
 import { Message, messaging } from "shared/game/messaging";
 import { Input } from "../input/input-class";
 import { UITil } from "../modules/ui-til";
@@ -55,12 +55,18 @@ export class PlayerController implements OnStart {
                 this.onMask.Fire();
 
             if (payload.data.bagged)
-                UITil.UpdateHoldingText(payload.data.bagged as keyof typeof Loot.value);
+                UITil.UpdateHoldingText(payload.data.bagged as LootValue);
         });
 
         messaging.client.on(Message.gameSessionSync, payload => {
             this.gameSyncer.sync(payload);
             this.gameStateUpdated.Fire();
+
+            if (payload.data.objective)
+                UITil.UpdateObjectiveText(payload.data.objective);
+
+            if (payload.data.ended)
+                UITil.OnEnd();
         });
 
         messaging.server.emit(Message.requestSessionState);

@@ -2,6 +2,7 @@ import { OnStart, Service } from "@flamework/core";
 import { Weapon } from "server/game/weapons/weapons-class";
 import { Message, messaging } from "shared/game/messaging";
 import { GetPlayer } from "../players/player-class";
+import { gameState } from "../state/game-state";
 
 @Service()
 export class WeaponService implements OnStart {
@@ -11,6 +12,7 @@ export class WeaponService implements OnStart {
         messaging.server.setCallback(Message.createWeapon, Message.createWeaponReturn, (player, data) => {
             if (!this.weapons[player.Name]) this.weapons[player.Name] = {};
             if (this.weapons[player.Name][data.weaponName]) return false;
+            if (gameState.ended() === true) return false;
 
             const weaponName = data.weaponName;
             const playerClass = GetPlayer(player);
